@@ -1,0 +1,5921 @@
+
+7.  YANG Statements
+
+   The following sections describe all of the YANG statements.
+
+   Note that even a statement that does not have any substatements
+   defined in YANG can have vendor-specific extensions as substatements.
+   For example, the "description" statement does not have any
+   substatements defined in YANG, but the following is legal:
+
+     description "Some text." {
+       ex:documentation-flag 5;
+     }
+
+7.1.  The "module" Statement
+
+   The "module" statement defines the module's name and groups all
+   statements that belong to the module together.  The "module"
+   statement's argument is the name of the module, followed by a block
+   of substatements that holds detailed module information.  The module
+   name is an identifier (see Section 6.2).
+
+   Names of modules published in RFC streams [RFC4844] MUST be assigned
+   by IANA; see Section 14 in [RFC6020].
+
+   Private module names are assigned by the organization owning the
+   module without a central registry.  See Section 5.1 for
+   recommendations on how to name modules.
+
+   A module typically has the following layout:
+
+     module <module-name> {
+
+       // header information
+       <yang-version statement>
+       <namespace statement>
+       <prefix statement>
+
+       // linkage statements
+       <import statements>
+       <include statements>
+
+       // meta-information
+       <organization statement>
+       <contact statement>
+       <description statement>
+       <reference statement>
+
+       // revision history
+       <revision statements>
+
+       // module definitions
+       <other statements>
+     }
+
+7.1.1.  The module's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | augment      | 7.17    | 0..n        |
+                 | choice       | 7.9     | 0..n        |
+                 | contact      | 7.1.8   | 0..1        |
+                 | container    | 7.5     | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | deviation    | 7.20.3  | 0..n        |
+                 | extension    | 7.19    | 0..n        |
+                 | feature      | 7.20.1  | 0..n        |
+                 | grouping     | 7.12    | 0..n        |
+                 | identity     | 7.18    | 0..n        |
+                 | import       | 7.1.5   | 0..n        |
+                 | include      | 7.1.6   | 0..n        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | namespace    | 7.1.3   | 1           |
+                 | notification | 7.16    | 0..n        |
+                 | organization | 7.1.7   | 0..1        |
+                 | prefix       | 7.1.4   | 1           |
+                 | reference    | 7.21.4  | 0..1        |
+                 | revision     | 7.1.9   | 0..n        |
+                 | rpc          | 7.14    | 0..n        |
+                 | typedef      | 7.3     | 0..n        |
+                 | uses         | 7.13    | 0..n        |
+                 | yang-version | 7.1.2   | 1           |
+                 +--------------+---------+-------------+
+
+
+7.1.2.  The "yang-version" Statement
+
+   The "yang-version" statement specifies which version of the YANG
+   language was used in developing the module.  The statement's argument
+   is a string.  It MUST contain the value "1.1" for YANG modules
+   defined based on this specification.
+
+   A module or submodule that doesn't contain the "yang-version"
+   statement, or one that contains the value "1", is developed for YANG
+   version 1, defined in [RFC6020].
+
+   Handling of the "yang-version" statement for versions other than
+   "1.1" (the version defined here) is out of scope for this
+   specification.  Any document that defines a higher version will need
+   to define the backward compatibility of such a higher version.
+
+   For compatibility between YANG versions 1 and 1.1, see Section 12.
+
+7.1.3.  The "namespace" Statement
+
+   The "namespace" statement defines the XML namespace that all
+   identifiers defined by the module are qualified by in the XML
+   encoding, with the exception of identifiers for data nodes, action
+   nodes, and notification nodes defined inside a grouping (see
+   Section 7.13 for details).  The argument to the "namespace" statement
+   is the URI of the namespace.
+
+   See also Section 5.3.
+
+7.1.4.  The "prefix" Statement
+
+   The "prefix" statement is used to define the prefix associated with
+   the module and its namespace.  The "prefix" statement's argument is
+   the prefix string that is used as a prefix to access a module.  The
+   prefix string MAY be used with the module to refer to definitions
+   contained in the module, e.g., "if:ifName".  A prefix is an
+   identifier (see Section 6.2).
+
+   When used inside the "module" statement, the "prefix" statement
+   defines the prefix suggested to be used when this module is imported.
+
+   To improve readability of the NETCONF XML, a NETCONF client or server
+   that generates XML or XPath that uses prefixes SHOULD use the prefix
+   defined by the module as the XML namespace prefix, unless there is a
+   conflict.
+
+
+
+   When used inside the "import" statement, the "prefix" statement
+   defines the prefix to be used when accessing definitions inside the
+   imported module.  When a reference to an identifier from the imported
+   module is used, the prefix string for the imported module followed by
+   a colon (":") and the identifier is used, e.g., "if:ifIndex".  To
+   improve readability of YANG modules, the prefix defined by a module
+   SHOULD be used when the module is imported, unless there is a
+   conflict.  If there is a conflict, i.e., two different modules that
+   both have defined the same prefix are imported, at least one of them
+   MUST be imported with a different prefix.
+
+   All prefixes, including the prefix for the module itself, MUST be
+   unique within the module or submodule.
+
+7.1.5.  The "import" Statement
+
+   The "import" statement makes definitions from one module available
+   inside another module or submodule.  The argument is the name of the
+   module to import, and the statement is followed by a block of
+   substatements that holds detailed import information.  When a module
+   is imported, the importing module may:
+
+   o  use any grouping and typedef defined at the top level in the
+      imported module or its submodules.
+
+   o  use any extension, feature, and identity defined in the imported
+      module or its submodules.
+
+   o  use any node in the imported module's schema tree in "must",
+      "path", and "when" statements, or as the target node in "augment"
+      and "deviation" statements.
+
+   The mandatory "prefix" substatement assigns a prefix for the imported
+   module that is scoped to the importing module or submodule.  Multiple
+   "import" statements may be specified to import from different
+   modules.
+
+   When the optional "revision-date" substatement is present, any
+   typedef, grouping, extension, feature, and identity referenced by
+   definitions in the local module are taken from the specified revision
+   of the imported module.  It is an error if the specified revision of
+   the imported module does not exist.  If no "revision-date"
+   substatement is present, it is undefined from which revision of the
+   module they are taken.
+
+   Multiple revisions of the same module can be imported, provided that
+   different prefixes are used.
+
+                 +---------------+---------+-------------+
+                 | substatement  | section | cardinality |
+                 +---------------+---------+-------------+
+                 | description   | 7.21.3  | 0..1        |
+                 | prefix        | 7.1.4   | 1           |
+                 | reference     | 7.21.4  | 0..1        |
+                 | revision-date | 7.1.5.1 | 0..1        |
+                 +---------------+---------+-------------+
+
+                        The import's Substatements
+
+7.1.5.1.  The import's "revision-date" Statement
+
+   The import's "revision-date" statement is used to specify the version
+   of the module to import.
+
+7.1.6.  The "include" Statement
+
+   The "include" statement is used to make content from a submodule
+   available to that submodule's parent module.  The argument is an
+   identifier that is the name of the submodule to include.  Modules are
+   only allowed to include submodules that belong to that module, as
+   defined by the "belongs-to" statement (see Section 7.2.2).
+
+   When a module includes a submodule, it incorporates the contents of
+   the submodule into the node hierarchy of the module.
+
+   For backward compatibility with YANG version 1, a submodule is
+   allowed to include another submodule belonging to the same module,
+   but this is not necessary in YANG version 1.1 (see Section 5.1).
+
+   When the optional "revision-date" substatement is present, the
+   specified revision of the submodule is included in the module.  It is
+   an error if the specified revision of the submodule does not exist.
+   If no "revision-date" substatement is present, it is undefined which
+   revision of the submodule is included.
+
+   Multiple revisions of the same submodule MUST NOT be included.
+
+                 +---------------+---------+-------------+
+                 | substatement  | section | cardinality |
+                 +---------------+---------+-------------+
+                 | description   | 7.21.3  | 0..1        |
+                 | reference     | 7.21.4  | 0..1        |
+                 | revision-date | 7.1.5.1 | 0..1        |
+                 +---------------+---------+-------------+
+
+                       The includes's Substatements
+
+
+
+
+7.1.7.  The "organization" Statement
+
+   The "organization" statement defines the party responsible for this
+   module.  The argument is a string that is used to specify a textual
+   description of the organization(s) under whose auspices this module
+   was developed.
+
+7.1.8.  The "contact" Statement
+
+   The "contact" statement provides contact information for the module.
+   The argument is a string that is used to specify contact information
+   for the person or persons to whom technical queries concerning this
+   module should be sent, such as their name, postal address, telephone
+   number, and electronic mail address.
+
+7.1.9.  The "revision" Statement
+
+   The "revision" statement specifies the editorial revision history of
+   the module, including the initial revision.  A series of "revision"
+   statements detail the changes in the module's definition.  The
+   argument is a date string in the format "YYYY-MM-DD", followed by a
+   block of substatements that holds detailed revision information.  A
+   module SHOULD have at least one "revision" statement.  For every
+   published editorial change, a new one SHOULD be added in front of the
+   revisions sequence so that all revisions are in reverse chronological
+   order.
+
+7.1.9.1.  The revision's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | description  | 7.21.3  | 0..1        |
+                 | reference    | 7.21.4  | 0..1        |
+                 +--------------+---------+-------------+
+
+
+
+7.1.10.  Usage Example
+
+   The following example relies on [RFC699.
+
+     module example-system {
+       yang-version 1.1;
+       namespace "urn:example:system";
+       prefix "sys";
+
+       import ietf-yang-types {
+         prefix "yang";
+         reference "RFC 6991: Common YANG Data Types";
+       }
+
+       include example-types;
+
+       organization "Example Inc.";
+       contact
+         "Joe L. User
+
+          Example Inc.
+          42 Anywhere Drive
+          Nowhere, CA 95134
+          USA
+
+          Phone: +1 800 555 0100
+          Email: joe@example.com";
+
+       description
+         "The module for entities implementing the Example system.";
+
+       revision 2007-06-09 {
+         description "Initial revision.";
+       }
+
+       // definitions follow...
+     }
+
+
+7.2.  The "submodule" Statement
+
+   While the primary unit in YANG is a module, a YANG module can itself
+   be constructed out of several submodules.  Submodules allow a module
+   designer to split a complex model into several pieces where all the
+   submodules contribute to a single namespace, which is defined by the
+   module that includes the submodules.
+
+   The "submodule" statement defines the submodule's name, and it groups
+   all statements that belong to the submodule together.  The
+   "submodule" statement's argument is the name of the submodule,
+   followed by a block of substatements that holds detailed submodule
+   information.  The submodule name is an identifier (see Section 6.2).
+
+   Names of submodules published in RFC streams [RFC4844] MUST be
+   assigned by IANA; see Section 14 in [RFC6020].
+
+   Private submodule names are assigned by the organization owning the
+   submodule without a central registry.  See Section 5.1 for
+   recommendations on how to name submodules.
+
+   A submodule typically has the following layout:
+
+     submodule <module-name> {
+
+       <yang-version statement>
+
+       // module identification
+       <belongs-to statement>
+
+       // linkage statements
+       <import statements>
+
+       // meta-information
+       <organization statement>
+       <contact statement>
+       <description statement>
+       <reference statement>
+
+       // revision history
+       <revision statements>
+
+       // module definitions
+       <other statements>
+     }
+
+
+7.2.1.  The submodule's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | augment      | 7.17    | 0..n        |
+                 | belongs-to   | 7.2.2   | 1           |
+                 | choice       | 7.9     | 0..n        |
+                 | contact      | 7.1.8   | 0..1        |
+                 | container    | 7.5     | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | deviation    | 7.20.3  | 0..n        |
+                 | extension    | 7.19    | 0..n        |
+                 | feature      | 7.20.1  | 0..n        |
+                 | grouping     | 7.12    | 0..n        |
+                 | identity     | 7.18    | 0..n        |
+                 | import       | 7.1.5   | 0..n        |
+                 | include      | 7.1.6   | 0..n        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | notification | 7.16    | 0..n        |
+                 | organization | 7.1.7   | 0..1        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | revision     | 7.1.9   | 0..n        |
+                 | rpc          | 7.14    | 0..n        |
+                 | typedef      | 7.3     | 0..n        |
+                 | uses         | 7.13    | 0..n        |
+                 | yang-version | 7.1.2   | 1           |
+                 +--------------+---------+-------------+
+
+7.2.2.  The "belongs-to" Statement
+
+   The "belongs-to" statement specifies the module to which the
+   submodule belongs.  The argument is an identifier that is the name of
+   the module.
+
+   A submodule MUST only be included by either the module to which it
+   belongs or another submodule that belongs to that module.
+
+   The mandatory "prefix" substatement assigns a prefix for the module
+   to which the submodule belongs.  All definitions in the module that
+   the submodule belongs to and all its submodules can be accessed by
+   using the prefix.
+
+
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | prefix       | 7.1.4   | 1           |
+                 +--------------+---------+-------------+
+
+                       The belongs-to's Substatement
+
+7.2.3.  Usage Example
+
+     submodule example-types {
+       yang-version 1.1;
+       belongs-to "example-system" {
+         prefix "sys";
+       }
+
+       import ietf-yang-types {
+         prefix "yang";
+       }
+
+       organization "Example Inc.";
+       contact
+         "Joe L. User
+
+          Example Inc.
+          42 Anywhere Drive
+          Nowhere, CA 95134
+          USA
+
+          Phone: +1 800 555 0100
+          Email: joe@example.com";
+
+       description
+         "This submodule defines common Example types.";
+
+       revision "2007-06-09" {
+         description "Initial revision.";
+       }
+
+       // definitions follow...
+     }
+
+
+
+7.3.  The "typedef" Statement
+
+   The "typedef" statement defines a new type that may be used locally
+   in the module or submodule, and by other modules that import from it,
+   according to the rules in Section 5.5.  The new type is called the
+   "derived type", and the type from which it was derived is called the
+   "base type".  All derived types can be traced back to a YANG
+   built-in type.
+
+   The "typedef" statement's argument is an identifier that is the name
+   of the type to be defined and MUST be followed by a block of
+   substatements that holds detailed typedef information.
+
+   The name of the type MUST NOT be one of the YANG built-in types.  If
+   the typedef is defined at the top level of a YANG module or
+   submodule, the name of the type to be defined MUST be unique within
+   the module.
+
+7.3.1.  The typedef's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | default      | 7.3.4   | 0..1        |
+                 | description  | 7.21.3  | 0..1        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | type         | 7.3.2   | 1           |
+                 | units        | 7.3.3   | 0..1        |
+                 +--------------+---------+-------------+
+
+7.3.2.  The typedef's "type" Statement
+
+   The "type" statement, which MUST be present, defines the base type
+   from which this type is derived.  See Section 7.4 for details.
+
+7.3.3.  The "units" Statement
+
+   The "units" statement, which is optional, takes as an argument a
+   string that contains a textual definition of the units associated
+   with the type.
+
+
+7.3.4.  The typedef's "default" Statement
+
+   The "default" statement takes as an argument a string that contains a
+   default value for the new type.
+
+   The value of the "default" statement MUST be valid according to the
+   type specified in the "type" statement.
+
+   If the base type has a default value and the new derived type does
+   not specify a new default value, the base type's default value is
+   also the default value of the new derived type.
+
+   If the type's default value is not valid according to the new
+   restrictions specified in a derived type or leaf definition, the
+   derived type or leaf definition MUST specify a new default value
+   compatible with the restrictions.
+
+7.3.5.  Usage Example
+
+     typedef listen-ipv4-address {
+       type inet:ipv4-address;
+       default "0.0.0.0";
+     }
+
+7.4.  The "type" Statement
+
+   The "type" statement takes as an argument a string that is the name
+   of a YANG built-in type (see Section 9) or a derived type (see
+   Section 7.3), followed by an optional block of substatements that is
+   used to put further restrictions on the type.
+
+   The restrictions that can be applied depend on the type being
+   restricted.  The restriction statements for all built-in types are
+   described in the subsections of Section 9.
+
+
+
+
+7.4.1.  The type's Substatements
+
+               +------------------+---------+-------------+
+               | substatement     | section | cardinality |
+               +------------------+---------+-------------+
+               | base             | 7.18.2  | 0..n        |
+               | bit              | 9.7.4   | 0..n        |
+               | enum             | 9.6.4   | 0..n        |
+               | fraction-digits  | 9.3.4   | 0..1        |
+               | length           | 9.4.4   | 0..1        |
+               | path             | 9.9.2   | 0..1        |
+               | pattern          | 9.4.5   | 0..n        |
+               | range            | 9.2.4   | 0..1        |
+               | require-instance | 9.9.3   | 0..1        |
+               | type             | 7.4     | 0..n        |
+               +------------------+---------+-------------+
+
+7.5.  The "container" Statement
+
+   The "container" statement is used to define an interior data node in
+   the schema tree.  It takes one argument, which is an identifier,
+   followed by a block of substatements that holds detailed container
+   information.
+
+   A container node does not have a value, but it has a list of child
+   nodes in the data tree.  The child nodes are defined in the
+   container's substatements.
+
+7.5.1.  Containers with Presence
+
+   YANG supports two styles of containers, those that exist only for
+   organizing the hierarchy of data nodes and those whose presence in
+   the data tree has an explicit meaning.
+
+   In the first style, the container has no meaning of its own, existing
+   only to contain child nodes.  In particular, the presence of the
+   container node with no child nodes is semantically equivalent to the
+   absence of the container node.  YANG calls this style a "non-presence
+   container".  This is the default style.
+
+   For example, the set of scrambling options for Synchronous Optical
+   Network (SONET) interfaces may be placed inside a "scrambling"
+   container to enhance the organization of the configuration hierarchy
+   and to keep these nodes together.  The "scrambling" node itself has
+   no meaning, so removing the node when it becomes empty relieves the
+   user from performing this task.
+
+
+   In the second style, the presence of the container itself carries
+   some meaning, representing a single bit of data.
+
+   For configuration data, the container acts as both a configuration
+   knob and a means of organizing related configuration nodes.  These
+   containers are explicitly created and deleted.
+
+   YANG calls this style a "presence container", and it is indicated
+   using the "presence" statement, which takes as its argument a text
+   string indicating what the presence of the node means.
+
+   For example, an "ssh" container may turn on the ability to log into
+   the server using Secure SHell (SSH) but can also contain any
+   SSH-related configuration knobs, such as connection rates or retry
+   limits.
+
+   The "presence" statement (see Section 7.5.5) is used to give
+   semantics to the existence of the container in the data tree.
+
+7.5.2.  The container's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | action       | 7.15    | 0..n        |
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | choice       | 7.9     | 0..n        |
+                 | config       | 7.21.1  | 0..1        |
+                 | container    | 7.5     | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | grouping     | 7.12    | 0..n        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | must         | 7.5.3   | 0..n        |
+                 | notification | 7.16    | 0..n        |
+                 | presence     | 7.5.5   | 0..1        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | typedef      | 7.3     | 0..n        |
+                 | uses         | 7.13    | 0..n        |
+                 | when         | 7.21.5  | 0..1        |
+                 +--------------+---------+-------------+
+
+
+
+7.5.3.  The "must" Statement
+
+   The "must" statement, which is optional, takes as an argument a
+   string that contains an XPath expression (see Section 6.4).  It is
+   used to formally declare a constraint on valid data.  The constraint
+   is enforced according to the rules in Section 8.
+
+   When a datastore is validated, all "must" constraints are
+   conceptually evaluated once for each node in the accessible tree (see
+   Section 6.4.1).
+
+   All such constraints MUST evaluate to "true" for the data to be
+   valid.
+
+   The XPath expression is conceptually evaluated in the following
+   context, in addition to the definition in Section 6.4.1:
+
+   o  If the "must" statement is a substatement of a "notification"
+      statement, the context node is the node representing the
+      notification in the accessible tree.
+
+   o  If the "must" statement is a substatement of an "input" statement,
+      the context node is the node representing the operation in the
+      accessible tree.
+
+   o  If the "must" statement is a substatement of an "output"
+      statement, the context node is the node representing the operation
+      in the accessible tree.
+
+   o  Otherwise, the context node is the node in the accessible tree for
+      which the "must" statement is defined.
+
+   The result of the XPath expression is converted to a boolean value
+   using the standard XPath rules.
+
+   Note that since all leaf values in the data tree are conceptually
+   stored in their canonical form (see Section 9.1), any XPath
+   comparisons are done on the canonical value.
+
+   Also note that the XPath expression is conceptually evaluated.  This
+   means that an implementation does not have to use an XPath evaluator
+   in the server.  How the evaluation is done in practice is an
+   implementation decision.
+
+
+
+
+
+7.5.4.  The must's Substatements
+
+                 +---------------+---------+-------------+
+                 | substatement  | section | cardinality |
+                 +---------------+---------+-------------+
+                 | description   | 7.21.3  | 0..1        |
+                 | error-app-tag | 7.5.4.2 | 0..1        |
+                 | error-message | 7.5.4.1 | 0..1        |
+                 | reference     | 7.21.4  | 0..1        |
+                 +---------------+---------+-------------+
+
+7.5.4.1.  The "error-message" Statement
+
+   The "error-message" statement, which is optional, takes a string as
+   an argument.  If the constraint evaluates to "false", the string is
+   passed as <error-message> in the <rpc-error> in NETCONF.
+
+7.5.4.2.  The "error-app-tag" Statement
+
+   The "error-app-tag" statement, which is optional, takes a string as
+   an argument.  If the constraint evaluates to "false", the string is
+   passed as <error-app-tag> in the <rpc-error> in NETCONF.
+
+7.5.4.3.  Usage Example of must and error-message
+
+     container interface {
+       leaf ifType {
+         type enumeration {
+           enum ethernet;
+           enum atm;
+         }
+       }
+       leaf ifMTU {
+         type uint32;
+       }
+       must 'ifType != "ethernet" or ifMTU = 1500' {
+         error-message "An Ethernet MTU must be 1500";
+       }
+       must 'ifType != "atm" or'
+          + ' (ifMTU <= 17966 and ifMTU >= 64)' {
+         error-message "An ATM MTU must be 64 .. 17966";
+       }
+     }
+
+
+7.5.5.  The "presence" Statement
+
+   The "presence" statement assigns a meaning to the presence of a
+   container in the data tree.  It takes as an argument a string that
+   contains a textual description of what the node's presence means.
+
+   If a container has the "presence" statement, the container's
+   existence in the data tree carries some meaning.  Otherwise, the
+   container is used to give some structure to the data, and it carries
+   no meaning by itself.
+
+   See Section 7.5.1 for additional information.
+
+7.5.6.  The container's Child Node Statements
+
+   Within a container, the "container", "leaf", "list", "leaf-list",
+   "uses", "choice", "anydata", and "anyxml" statements can be used to
+   define child nodes to the container.
+
+7.5.7.  XML Encoding Rules
+
+   A container node is encoded as an XML element.  The element's local
+   name is the container's identifier, and its namespace is the module's
+   XML namespace (see Section 7.1.3).
+
+   The container's child nodes are encoded as subelements to the
+   container element.  If the container defines RPC or action input or
+   output parameters, these subelements are encoded in the same order as
+   they are defined within the "container" statement.  Otherwise, the
+   subelements are encoded in any order.
+
+   Any whitespace between the subelements to the container is
+   insignificant, i.e., an implementation MAY insert whitespace
+   characters between subelements.
+
+   If a non-presence container does not have any child nodes, the
+   container may or may not be present in the XML encoding.
+
+
+
+7.5.8.  NETCONF <edit-config> Operations
+
+   Containers can be created, deleted, replaced, and modified through
+   <edit-config> by using the "operation" attribute (see Section 7.2 in
+   [RFC624) in the container's XML element.
+
+   If a container does not have a "presence" statement and the last
+   child node is deleted, the NETCONF server MAY delete the container.
+
+   When a NETCONF server processes an <edit-config> request, the
+   elements of procedure for the container node are as follows:
+
+   o  If the operation is "merge" or "replace", the node is created if
+      it does not exist.
+
+   o  If the operation is "create", the node is created if it does not
+      exist.  If the node already exists, a "data-exists" error is
+      returned.
+
+   o  If the operation is "delete", the node is deleted if it exists.
+      If the node does not exist, a "data-missing" error is returned.
+
+7.5.9.  Usage Example
+
+   Given the following container definition:
+
+     container system {
+       description
+         "Contains various system parameters.";
+       container services {
+         description
+           "Configure externally available services.";
+         container "ssh" {
+           presence "Enables SSH";
+           description
+             "SSH service-specific configuration.";
+           // more leafs, containers, and stuff here...
+         }
+       }
+     }
+
+
+   A corresponding XML instance example:
+
+     <system>
+       <services>
+         <ssh/>
+       </services>
+     </system>
+
+   Since the <ssh> element is present, SSH is enabled.
+
+   To delete a container with an <edit-config>:
+
+     <rpc message-id="101"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <edit-config>
+         <target>
+           <running/>
+         </target>
+         <config>
+           <system xmlns="urn:example:config">
+             <services>
+               <ssh nc:operation="delete"/>
+             </services>
+           </system>
+         </config>
+       </edit-config>
+     </rpc>
+
+7.6.  The "leaf" Statement
+
+   The "leaf" statement is used to define a leaf node in the schema
+   tree.  It takes one argument, which is an identifier, followed by a
+   block of substatements that holds detailed leaf information.
+
+   A leaf node has a value, but no child nodes, in the data tree.
+   Conceptually, the value in the data tree is always in the canonical
+   form (see Section 9.1).
+
+   A leaf node exists in zero or one instance in the data tree.
+
+   The "leaf" statement is used to define a scalar variable of a
+   particular built-in or derived type.
+
+
+
+7.6.1.  The leaf's Default Value
+
+   The default value of a leaf is the value that the server uses if the
+   leaf does not exist in the data tree.  The usage of the default value
+   depends on the leaf's closest ancestor node in the schema tree that
+   is not a non-presence container (see Section 7.5.1):
+
+   o  If no such ancestor exists in the schema tree, the default value
+      MUST be used.
+
+   o  Otherwise, if this ancestor is a case node, the default value MUST
+      be used if any node from the case exists in the data tree or the
+      case node is the choice's default case, and if no nodes from any
+      other case exist in the data tree.
+
+   o  Otherwise, the default value MUST be used if the ancestor node
+      exists in the data tree.
+
+   In these cases, the default value is said to be in use.
+
+   Note that if the leaf or any of its ancestors has a "when" condition
+   or "if-feature" expression that evaluates to "false", then the
+   default value is not in use.
+
+   When the default value is in use, the server MUST operationally
+   behave as if the leaf was present in the data tree with the default
+   value as its value.
+
+   If a leaf has a "default" statement, the leaf's default value is the
+   value of the "default" statement.  Otherwise, if the leaf's type has
+   a default value and the leaf is not mandatory, then the leaf's
+   default value is the type's default value.  In all other cases, the
+   leaf does not have a default value.
+
+
+7.6.2.  The leaf's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | config       | 7.21.1  | 0..1        |
+                 | default      | 7.6.4   | 0..1        |
+                 | description  | 7.21.3  | 0..1        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | mandatory    | 7.6.5   | 0..1        |
+                 | must         | 7.5.3   | 0..n        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | type         | 7.6.3   | 1           |
+                 | units        | 7.3.3   | 0..1        |
+                 | when         | 7.21.5  | 0..1        |
+                 +--------------+---------+-------------+
+
+7.6.3.  The leaf's "type" Statement
+
+   The "type" statement, which MUST be present, takes as an argument the
+   name of an existing built-in or derived type.  The optional
+   substatements specify restrictions on this type.  See Section 7.4 for
+   details.
+
+7.6.4.  The leaf's "default" Statement
+
+   The "default" statement, which is optional, takes as an argument a
+   string that contains a default value for the leaf.
+
+   The value of the "default" statement MUST be valid according to the
+   type specified in the leaf's "type" statement.
+
+   The "default" statement MUST NOT be present on nodes where
+   "mandatory" is "true".
+
+   The definition of the default value MUST NOT be marked with an
+   "if-feature" statement.  For example, the following is illegal:
+
+     leaf color {
+       type enumeration {
+         enum blue { if-feature blue; }
+         ...
+       }
+       default blue; // illegal - enum value is conditional
+     }
+
+
+7.6.5.  The leaf's "mandatory" Statement
+
+   The "mandatory" statement, which is optional, takes as an argument
+   the string "true" or "false" and puts a constraint on valid data.  If
+   not specified, the default is "false".
+
+   If "mandatory" is "true", the behavior of the constraint depends on
+   the type of the leaf's closest ancestor node in the schema tree that
+   is not a non-presence container (see Section 7.5.1):
+
+   o  If no such ancestor exists in the schema tree, the leaf MUST
+      exist.
+
+   o  Otherwise, if this ancestor is a case node, the leaf MUST exist if
+      any node from the case exists in the data tree.
+
+   o  Otherwise, the leaf MUST exist if the ancestor node exists in the
+      data tree.
+
+   This constraint is enforced according to the rules in Section 8.
+
+7.6.6.  XML Encoding Rules
+
+   A leaf node is encoded as an XML element.  The element's local name
+   is the leaf's identifier, and its namespace is the module's XML
+   namespace (see Section 7.1.3).
+
+   The value of the leaf node is encoded to XML according to the type
+   and is sent as character data in the element.
+
+   See Section 7.6.8 for an example.
+
+7.6.7.  NETCONF <edit-config> Operations
+
+   When a NETCONF server processes an <edit-config> request, the
+   elements of procedure for the leaf node are as follows:
+
+   o  If the operation is "merge" or "replace", the node is created if
+      it does not exist, and its value is set to the value found in the
+      XML RPC data.
+
+   o  If the operation is "create", the node is created if it does not
+      exist.  If the node already exists, a "data-exists" error is
+      returned.
+
+   o  If the operation is "delete", the node is deleted if it exists.
+      If the node does not exist, a "data-missing" error is returned.
+
+
+7.6.8.  Usage Example
+
+   Given the following "leaf" statement, placed in the previously
+   defined "ssh" container (see Section 7.5.9):
+
+     leaf port {
+       type inet:port-number;
+       default 22;
+       description
+         "The port to which the SSH server listens.";
+     }
+
+   A corresponding XML instance example:
+
+     <port>2022</port>
+
+   To set the value of a leaf with an <edit-config>:
+
+     <rpc message-id="101"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <edit-config>
+         <target>
+           <running/>
+         </target>
+         <config>
+           <system xmlns="urn:example:config">
+             <services>
+               <ssh>
+                 <port>2022</port>
+               </ssh>
+             </services>
+           </system>
+         </config>
+       </edit-config>
+     </rpc>
+
+7.7.  The "leaf-list" Statement
+
+   Where the "leaf" statement is used to define a simple scalar variable
+   of a particular type, the "leaf-list" statement is used to define an
+   array of a particular type.  The "leaf-list" statement takes one
+   argument, which is an identifier, followed by a block of
+   substatements that holds detailed leaf-list information.
+
+   In configuration data, the values in a leaf-list MUST be unique.
+
+   The definitions of the default values MUST NOT be marked with an
+   "if-feature" statement.
+
+   Conceptually, the values in the data tree MUST be in the canonical
+   form (see Section 9.1).
+
+7.7.1.  Ordering
+
+   YANG supports two styles for ordering the entries within lists and
+   leaf-lists.  In many lists, the order of list entries does not impact
+   the implementation of the list's configuration, and the server is
+   free to sort the list entries in any reasonable order.  The
+   "description" string for the list may suggest an order to the server
+   implementor.  YANG calls this style of list "system ordered"; such
+   lists are indicated with the statement "ordered-by system".
+
+   For example, a list of valid users would typically be sorted
+   alphabetically, since the order in which the users appeared in the
+   configuration would not impact the creation of those users' accounts.
+
+   In the other style of lists, the order of list entries matters for
+   the implementation of the list's configuration and the user is
+   responsible for ordering the entries, while the server maintains that
+   order.  YANG calls this style of list "user ordered"; such lists are
+   indicated with the statement "ordered-by user".
+
+   For example, the order in which packet filter entries are applied to
+   incoming traffic may affect how that traffic is filtered.  The user
+   would need to decide if the filter entry that discards all TCP
+   traffic should be applied before or after the filter entry that
+   allows all traffic from trusted interfaces.  The choice of order
+   would be crucial.
+
+   YANG provides a rich set of facilities within NETCONF's <edit-config>
+   operation that allows the order of list entries in user-ordered lists
+   to be controlled.  List entries may be inserted or rearranged,
+   positioned as the first or last entry in the list, or positioned
+   before or after another specific entry.
+
+   The "ordered-by" statement is covered in Section 7.7.7.
+
+
+7.7.2.  The leaf-list's Default Values
+
+   The default values of a leaf-list are the values that the server uses
+   if the leaf-list does not exist in the data tree.  The usage of the
+   default values depends on the leaf-list's closest ancestor node in
+   the schema tree that is not a non-presence container (see
+   Section 7.5.1):
+
+   o  If no such ancestor exists in the schema tree, the default values
+      MUST be used.
+
+   o  Otherwise, if this ancestor is a case node, the default values
+      MUST be used if any node from the case exists in the data tree or
+      the case node is the choice's default case, and if no nodes from
+      any other case exist in the data tree.
+
+   o  Otherwise, the default values MUST be used if the ancestor node
+      exists in the data tree.
+
+   In these cases, the default values are said to be in use.
+
+   Note that if the leaf-list or any of its ancestors has a "when"
+   condition or "if-feature" expression that evaluates to "false", then
+   the default values are not in use.
+
+   When the default values are in use, the server MUST operationally
+   behave as if the leaf-list was present in the data tree with the
+   default values as its values.
+
+   If a leaf-list has one or more "default" statements, the leaf-list's
+   default values are the values of the "default" statements, and if the
+   leaf-list is user ordered, the default values are used in the order
+   of the "default" statements.  Otherwise, if the leaf-list's type has
+   a default value and the leaf-list does not have a "min-elements"
+   statement with a value greater than or equal to one, then the
+   leaf-list's default value is one instance of the type's default
+   value.  In all other cases, the leaf-list does not have any default
+   values.
+
+
+
+7.7.3.  The leaf-list's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | config       | 7.21.1  | 0..1        |
+                 | default      | 7.7.4   | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | max-elements | 7.7.6   | 0..1        |
+                 | min-elements | 7.7.5   | 0..1        |
+                 | must         | 7.5.3   | 0..n        |
+                 | ordered-by   | 7.7.7   | 0..1        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | type         | 7.4     | 1           |
+                 | units        | 7.3.3   | 0..1        |
+                 | when         | 7.21.5  | 0..1        |
+                 +--------------+---------+-------------+
+
+7.7.4.  The leaf-list's "default" Statement
+
+   The "default" statement, which is optional, takes as an argument a
+   string that contains a default value for the leaf-list.
+
+   The value of the "default" statement MUST be valid according to the
+   type specified in the leaf-list's "type" statement.
+
+   The "default" statement MUST NOT be present on nodes where
+   "min-elements" has a value greater than or equal to one.
+
+7.7.5.  The "min-elements" Statement
+
+   The "min-elements" statement, which is optional, takes as an argument
+   a non-negative integer that puts a constraint on valid list entries.
+   A valid leaf-list or list MUST have at least min-elements entries.
+
+   If no "min-elements" statement is present, it defaults to zero.
+
+   The behavior of the constraint depends on the type of the leaf-list's
+   or list's closest ancestor node in the schema tree that is not a
+   non-presence container (see Section 7.5.1):
+
+   o  If no such ancestor exists in the schema tree, the constraint is
+      enforced.
+
+   o  Otherwise, if this ancestor is a case node, the constraint is
+      enforced if any other node from the case exists.
+
+
+   o  Otherwise, it is enforced if the ancestor node exists.
+
+   The constraint is further enforced according to the rules in
+   Section 8.
+
+7.7.6.  The "max-elements" Statement
+
+   The "max-elements" statement, which is optional, takes as an argument
+   a positive integer or the string "unbounded", which puts a constraint
+   on valid list entries.  A valid leaf-list or list always has at most
+   max-elements entries.
+
+   If no "max-elements" statement is present, it defaults to
+   "unbounded".
+
+   The "max-elements" constraint is enforced according to the rules in
+   Section 8.
+
+7.7.7.  The "ordered-by" Statement
+
+   The "ordered-by" statement defines whether the order of entries
+   within a list are determined by the user or the system.  The argument
+   is one of the strings "system" or "user".  If not present, ordering
+   defaults to "system".
+
+   This statement is ignored if the list represents state data, RPC
+   output parameters, or notification content.
+
+   See Section 7.7.1 for additional information.
+
+7.7.7.1.  ordered-by system
+
+   The entries in the list are ordered according to an order determined
+   by the system.  The "description" string for the list may suggest an
+   order to the server implementor.  If not, an implementation is free
+   to order the entries in any order.  An implementation SHOULD use the
+   same order for the same data, regardless of how the data were
+   created.  Using a deterministic order will make comparisons possible
+   using simple tools like "diff".
+
+   This is the default order.
+
+7.7.7.2.  ordered-by user
+
+   The entries in the list are ordered according to an order defined by
+   the user.  In NETCONF, this order is controlled by using special XML
+   attributes in the <edit-config> request.  See Section 7.7.9 for
+   details.
+
+
+7.7.8.  XML Encoding Rules
+
+   A leaf-list node is encoded as a series of XML elements.  Each
+   element's local name is the leaf-list's identifier, and its namespace
+   is the module's XML namespace (see Section 7.1.3).
+
+   The value of each leaf-list entry is encoded to XML according to the
+   type and is sent as character data in the element.
+
+   The XML elements representing leaf-list entries MUST appear in the
+   order specified by the user if the leaf-list is "ordered-by user";
+   otherwise, the order is implementation dependent.  The XML elements
+   representing leaf-list entries MAY be interleaved with elements for
+   siblings of the leaf-list, unless the leaf-list defines RPC or action
+   input or output parameters.
+
+   See Section 7.7.10 for an example.
+
+7.7.9.  NETCONF <edit-config> Operations
+
+   Leaf-list entries can be created and deleted, but not modified,
+   through <edit-config>, by using the "operation" attribute in the
+   leaf-list entry's XML element.
+
+   In an "ordered-by user" leaf-list, the attributes "insert" and
+   "value" in the YANG XML namespace (Section 5.3.1) can be used to
+   control where in the leaf-list the entry is inserted.  These can be
+   used during "create" operations to insert a new leaf-list entry, or
+   during "merge" or "replace" operations to insert a new leaf-list
+   entry or move an existing one.
+
+   The "insert" attribute can take the values "first", "last", "before",
+   and "after".  If the value is "before" or "after", the "value"
+   attribute MUST also be used to specify an existing entry in the
+   leaf-list.
+
+   If no "insert" attribute is present in the "create" operation, it
+   defaults to "last".
+
+   If several entries in an "ordered-by user" leaf-list are modified in
+   the same <edit-config> request, the entries are modified one at a
+   time, in the order of the XML elements in the request.
+
+   In a <copy-config> or in an <edit-config> with a "replace" operation
+   that covers the entire leaf-list, the leaf-list order is the same as
+   the order of the XML elements in the request.
+
+
+
+
+
+
+
+
+
+   When a NETCONF server processes an <edit-config> request, the
+   elements of procedure for a leaf-list node are as follows:
+
+   o  If the operation is "merge" or "replace", the leaf-list entry is
+      created if it does not exist.
+
+   o  If the operation is "create", the leaf-list entry is created if it
+      does not exist.  If the leaf-list entry already exists, a
+      "data-exists" error is returned.
+
+   o  If the operation is "delete", the entry is deleted from the
+      leaf-list if it exists.  If the leaf-list entry does not exist, a
+      "data-missing" error is returned.
+
+7.7.10.  Usage Example
+
+     leaf-list allow-user {
+       type string;
+       description
+         "A list of user name patterns to allow.";
+     }
+
+   A corresponding XML instance example:
+
+     <allow-user>alice</allow-user>
+     <allow-user>bob</allow-user>
+
+   To create a new element in this list, using the default <edit-config>
+   operation "merge":
+
+     <rpc message-id="101"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <edit-config>
+         <target>
+           <running/>
+         </target>
+         <config>
+           <system xmlns="urn:example:config">
+             <services>
+               <ssh>
+                 <allow-user>eric</allow-user>
+               </ssh>
+             </services>
+           </system>
+         </config>
+       </edit-config>
+     </rpc>
+
+
+
+
+
+
+
+   Given the following ordered-by user leaf-list:
+
+     leaf-list cipher {
+       type string;
+       ordered-by user;
+       description
+         "A list of ciphers.";
+     }
+
+   The following would be used to insert a new cipher "blowfish-cbc"
+   after "3des-cbc":
+
+     <rpc message-id="102"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:yang="urn:ietf:params:xml:ns:yang:1">
+       <edit-config>
+         <target>
+           <running/>
+         </target>
+         <config>
+           <system xmlns="urn:example:config">
+             <services>
+               <ssh>
+                 <cipher nc:operation="create"
+                         yang:insert="after"
+                         yang:value="3des-cbc">blowfish-cbc</cipher>
+               </ssh>
+             </services>
+           </system>
+         </config>
+       </edit-config>
+     </rpc>
+
+7.8.  The "list" Statement
+
+   The "list" statement is used to define an interior data node in the
+   schema tree.  A list node may exist in multiple instances in the data
+   tree.  Each such instance is known as a list entry.  The "list"
+   statement takes one argument, which is an identifier, followed by a
+   block of substatements that holds detailed list information.
+
+   A list entry is uniquely identified by the values of the list's keys,
+   if defined.
+
+
+
+
+
+
+
+
+
+
+
+7.8.1.  The list's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | action       | 7.15    | 0..n        |
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | choice       | 7.9     | 0..n        |
+                 | config       | 7.21.1  | 0..1        |
+                 | container    | 7.5     | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | grouping     | 7.12    | 0..n        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | key          | 7.8.2   | 0..1        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | max-elements | 7.7.6   | 0..1        |
+                 | min-elements | 7.7.5   | 0..1        |
+                 | must         | 7.5.3   | 0..n        |
+                 | notification | 7.16    | 0..n        |
+                 | ordered-by   | 7.7.7   | 0..1        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | typedef      | 7.3     | 0..n        |
+                 | unique       | 7.8.3   | 0..n        |
+                 | uses         | 7.13    | 0..n        |
+                 | when         | 7.21.5  | 0..1        |
+                 +--------------+---------+-------------+
+
+7.8.2.  The list's "key" Statement
+
+   The "key" statement, which MUST be present if the list represents
+   configuration and MAY be present otherwise, takes as an argument a
+   string that specifies a space-separated list of one or more leaf
+   identifiers of this list.  A leaf identifier MUST NOT appear more
+   than once in the key.  Each such leaf identifier MUST refer to a
+   child leaf of the list.  The leafs can be defined directly in
+   substatements to the list or in groupings used in the list.
+
+   The combined values of all the leafs specified in the key are used to
+   uniquely identify a list entry.  All key leafs MUST be given values
+   when a list entry is created.  Thus, any default values in the key
+   leafs or their types are ignored.  Any "mandatory" statements in the
+   key leafs are ignored.
+
+
+
+
+
+
+
+
+
+   A leaf that is part of the key can be of any built-in or
+   derived type.
+
+   All key leafs in a list MUST have the same value for their "config"
+   as the list itself.
+
+   The key string syntax is formally defined by the rule "key-arg" in
+   Section 14.
+
+7.8.3.  The list's "unique" Statement
+
+   The "unique" statement is used to put constraints on valid list
+   entries.  It takes as an argument a string that contains a space-
+   separated list of schema node identifiers, which MUST be given in the
+   descendant form (see the rule "descendant-schema-nodeid" in
+   Section 14).  Each such schema node identifier MUST refer to a leaf.
+
+   If one of the referenced leafs represents configuration data, then
+   all of the referenced leafs MUST represent configuration data.
+
+   The "unique" constraint specifies that the combined values of all the
+   leaf instances specified in the argument string, including leafs with
+   default values, MUST be unique within all list entry instances in
+   which all referenced leafs exist or have default values.  The
+   constraint is enforced according to the rules in Section 8.
+
+   The unique string syntax is formally defined by the rule "unique-arg"
+   in Section 14.
+
+7.8.3.1.  Usage Example
+
+   With the following list:
+
+     list server {
+       key "name";
+       unique "ip port";
+       leaf name {
+         type string;
+       }
+       leaf ip {
+         type inet:ip-address;
+       }
+       leaf port {
+         type inet:port-number;
+       }
+     }
+
+
+
+
+
+
+
+
+
+   the following configuration is not valid:
+
+     <server>
+       <name>smtp</name>
+       <ip>192.0.2.1</ip>
+       <port>25</port>
+     </server>
+
+     <server>
+       <name>http</name>
+       <ip>192.0.2.1</ip>
+       <port>25</port>
+     </server>
+
+   The following configuration is valid, since the "http" and "ftp" list
+   entries do not have a value for all referenced leafs and are thus not
+   taken into account when the "unique" constraint is enforced:
+
+     <server>
+       <name>smtp</name>
+       <ip>192.0.2.1</ip>
+       <port>25</port>
+     </server>
+
+     <server>
+       <name>http</name>
+       <ip>192.0.2.1</ip>
+     </server>
+
+     <server>
+       <name>ftp</name>
+       <ip>192.0.2.1</ip>
+     </server>
+
+7.8.4.  The list's Child Node Statements
+
+   Within a list, the "container", "leaf", "list", "leaf-list", "uses",
+   "choice", "anydata", and "anyxml" statements can be used to define
+   child nodes to the list.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7.8.5.  XML Encoding Rules
+
+   A list is encoded as a series of XML elements, one for each entry in
+   the list.  Each element's local name is the list's identifier, and
+   its namespace is the module's XML namespace (see Section 7.1.3).
+   There is no XML element surrounding the list as a whole.
+
+   The list's key nodes are encoded as subelements to the list's
+   identifier element, in the same order as they are defined within the
+   "key" statement.
+
+   The rest of the list's child nodes are encoded as subelements to the
+   list element, after the keys.  If the list defines RPC or action
+   input or output parameters, the subelements are encoded in the same
+   order as they are defined within the "list" statement.  Otherwise,
+   the subelements are encoded in any order.
+
+   Any whitespace between the subelements to the list entry is
+   insignificant, i.e., an implementation MAY insert whitespace
+   characters between subelements.
+
+   The XML elements representing list entries MUST appear in the order
+   specified by the user if the list is "ordered-by user"; otherwise,
+   the order is implementation dependent.  The XML elements representing
+   list entries MAY be interleaved with elements for siblings of the
+   list, unless the list defines RPC or action input or output
+   parameters.
+
+7.8.6.  NETCONF <edit-config> Operations
+
+   List entries can be created, deleted, replaced, and modified through
+   <edit-config> by using the "operation" attribute in the list's XML
+   element.  In each case, the values of all keys are used to uniquely
+   identify a list entry.  If all keys are not specified for a list
+   entry, a "missing-element" error is returned.
+
+   In an "ordered-by user" list, the attributes "insert" and "key" in
+   the YANG XML namespace (Section 5.3.1) can be used to control where
+   in the list the entry is inserted.  These can be used during "create"
+   operations to insert a new list entry, or during "merge" or "replace"
+   operations to insert a new list entry or move an existing one.
+
+   The "insert" attribute can take the values "first", "last", "before",
+   and "after".  If the value is "before" or "after", the "key"
+   attribute MUST also be used, to specify an existing element in the
+   list.  The value of the "key" attribute is the key predicates of the
+   full instance identifier (see Section 9.13) for the list entry.
+
+
+
+
+
+
+
+
+   If no "insert" attribute is present in the "create" operation, it
+   defaults to "last".
+
+   If several entries in an "ordered-by user" list are modified in the
+   same <edit-config> request, the entries are modified one at a time,
+   in the order of the XML elements in the request.
+
+   In a <copy-config> or in an <edit-config> with a "replace" operation
+   that covers the entire list, the list entry order is the same as the
+   order of the XML elements in the request.
+
+   When a NETCONF server processes an <edit-config> request, the
+   elements of procedure for a list node are as follows:
+
+   o  If the operation is "merge" or "replace", the list entry is
+      created if it does not exist.  If the list entry already exists
+      and the "insert" and "key" attributes are present, the list entry
+      is moved according to the values of the "insert" and "key"
+      attributes.  If the list entry exists and the "insert" and "key"
+      attributes are not present, the list entry is not moved.
+
+   o  If the operation is "create", the list entry is created if it does
+      not exist.  If the list entry already exists, a "data-exists"
+      error is returned.
+
+   o  If the operation is "delete", the entry is deleted from the list
+      if it exists.  If the list entry does not exist, a "data-missing"
+      error is returned.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7.8.7.  Usage Example
+
+   Given the following list:
+
+     list user {
+       key "name";
+       config true;
+       description
+         "This is a list of users in the system.";
+
+       leaf name {
+         type string;
+       }
+       leaf type {
+         type string;
+       }
+       leaf full-name {
+         type string;
+       }
+     }
+
+   A corresponding XML instance example:
+
+     <user>
+       <name>fred</name>
+       <type>admin</type>
+       <full-name>Fred Flintstone</full-name>
+     </user>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0]
+
+
+
+   To create a new user "barney":
+
+     <rpc message-id="101"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <edit-config>
+         <target>
+           <running/>
+         </target>
+         <config>
+           <system xmlns="urn:example:config">
+             <user nc:operation="create">
+               <name>barney</name>
+               <type>admin</type>
+               <full-name>Barney Rubble</full-name>
+             </user>
+           </system>
+         </config>
+       </edit-config>
+     </rpc>
+
+   To change the type of "fred" to "superuser":
+
+     <rpc message-id="102"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <edit-config>
+         <target>
+           <running/>
+         </target>
+         <config>
+           <system xmlns="urn:example:config">
+             <user>
+               <name>fred</name>
+               <type>superuser</type>
+             </user>
+           </system>
+         </config>
+       </edit-config>
+     </rpc>
+
+
+   Given the following ordered-by user list:
+
+     list user {
+       description
+         "This is a list of users in the system.";
+       ordered-by user;
+       config true;
+
+       key "first-name surname";
+
+       leaf first-name {
+         type string;
+       }
+       leaf surname {
+         type string;
+       }
+       leaf type {
+         type string;
+       }
+     }
+
+   The following would be used to insert a new user "barney rubble"
+   after the user "fred flintstone":
+
+     <rpc message-id="101"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:yang="urn:ietf:params:xml:ns:yang:1">
+       <edit-config>
+         <target>
+           <running/>
+         </target>
+         <config>
+           <system xmlns="urn:example:config"
+                xmlns:ex="urn:example:config">
+             <user nc:operation="create"
+                   yang:insert="after"
+                   yang:key="[ex:first-name='fred']
+                             [ex:surname='flintstone']">
+               <first-name>barney</first-name>
+               <surname>rubble</surname>
+               <type>admin</type>
+             </user>
+           </system>
+         </config>
+       </edit-config>
+     </rpc>
+
+
+
+
+
+
+
+
+   The following would be used to move the user "barney rubble" before
+   the user "fred flintstone":
+
+     <rpc message-id="102"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:yang="urn:ietf:params:xml:ns:yang:1">
+       <edit-config>
+         <target>
+           <running/>
+         </target>
+         <config>
+           <system xmlns="urn:example:config"
+                xmlns:ex="urn:example:config">
+             <user nc:operation="merge"
+                   yang:insert="before"
+                   yang:key="[ex:name='fred']
+                             [ex:surname='flintstone']">
+               <first-name>barney</first-name>
+               <surname>rubble</surname>
+             </user>
+           </system>
+         </config>
+       </edit-config>
+     </rpc>
+
+7.9.  The "choice" Statement
+
+   The "choice" statement defines a set of alternatives, only one of
+   which may be present in any one data tree.  The argument is an
+   identifier, followed by a block of substatements that holds detailed
+   choice information.  The identifier is used to identify the choice
+   node in the schema tree.  A choice node does not exist in the data
+   tree.
+
+   A choice consists of a number of branches, each defined with a "case"
+   substatement.  Each branch contains a number of child nodes.  The
+   nodes from at most one of the choice's branches exist at the same
+   time.
+
+   Since only one of the choice's cases can be valid at any time in the
+   data tree, the creation of a node from one case implicitly deletes
+   all nodes from all other cases.  If a request creates a node from a
+   case, the server will delete any existing nodes that are defined in
+   other cases inside the choice.
+
+
+
+
+
+
+
+
+
+
+7.9.1.  The choice's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | case         | 7.9.2   | 0..n        |
+                 | choice       | 7.9     | 0..n        |
+                 | config       | 7.21.1  | 0..1        |
+                 | container    | 7.5     | 0..n        |
+                 | default      | 7.9.3   | 0..1        |
+                 | description  | 7.21.3  | 0..1        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | mandatory    | 7.9.4   | 0..1        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | when         | 7.21.5  | 0..1        |
+                 +--------------+---------+-------------+
+
+7.9.2.  The choice's "case" Statement
+
+   The "case" statement is used to define branches of the choice.  It
+   takes as an argument an identifier, followed by a block of
+   substatements that holds detailed case information.
+
+   The identifier is used to identify the case node in the schema tree.
+   A case node does not exist in the data tree.
+
+   Within a "case" statement, the "anydata", "anyxml", "choice",
+   "container", "leaf", "list", "leaf-list", and "uses" statements can
+   be used to define child nodes to the case node.  The identifiers of
+   all these child nodes MUST be unique within all cases in a choice.
+   For example, the following is illegal:
+
+     choice interface-type {     // This example is illegal YANG
+       case a {
+         leaf ethernet { ... }
+       }
+       case b {
+         container ethernet { ...}
+       }
+     }
+
+
+
+
+
+4]
+
+
+
+   As a shorthand, the "case" statement can be omitted if the branch
+   contains a single "anydata", "anyxml", "choice", "container", "leaf",
+   "list", or "leaf-list" statement.  In this case, the case node still
+   exists in the schema tree, and its identifier is the same as the
+   identifier of the child node.  Schema node identifiers (Section 6.5)
+   MUST always explicitly include case node identifiers.  The following
+   example:
+
+     choice interface-type {
+       container ethernet { ... }
+     }
+
+   is equivalent to:
+
+     choice interface-type {
+       case ethernet {
+         container ethernet { ... }
+       }
+     }
+
+   The case identifier MUST be unique within a choice.
+
+7.9.2.1.  The case's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | choice       | 7.9     | 0..n        |
+                 | container    | 7.5     | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | uses         | 7.13    | 0..n        |
+                 | when         | 7.21.5  | 0..1        |
+                 +--------------+---------+-------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7.9.3.  The choice's "default" Statement
+
+   The "default" statement indicates if a case should be considered as
+   the default if no child nodes from any of the choice's cases exist.
+   The argument is the identifier of the default "case" statement.  If
+   the "default" statement is missing, there is no default case.
+
+   The "default" statement MUST NOT be present on choices where
+   "mandatory" is "true".
+
+   The default case is only important when considering the "default"
+   statements of nodes under the cases (i.e., default values of leafs
+   and leaf-lists, and default cases of nested choices).  The default
+   values and nested default cases under the default case are used if
+   none of the nodes under any of the cases are present.
+
+   There MUST NOT be any mandatory nodes (Section 3) directly under the
+   default case.
+
+   Default values for child nodes under a case are only used if one of
+   the nodes under that case is present or if that case is the default
+   case.  If none of the nodes under a case are present and the case is
+   not the default case, the default values of the cases' child nodes
+   are ignored.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   In this example, the choice defaults to "interval", and the default
+   value will be used if none of "daily", "time-of-day", or "manual" are
+   present.  If "daily" is present, the default value for "time-of-day"
+   will be used.
+
+     container transfer {
+       choice how {
+         default interval;
+         case interval {
+           leaf interval {
+             type uint16;
+             units minutes;
+             default 30;
+           }
+         }
+         case daily {
+           leaf daily {
+             type empty;
+           }
+           leaf time-of-day {
+             type string;
+             units 24-hour-clock;
+             default "01.00";
+           }
+         }
+         case manual {
+           leaf manual {
+             type empty;
+           }
+         }
+       }
+     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7.9.4.  The choice's "mandatory" Statement
+
+   The "mandatory" statement, which is optional, takes as an argument
+   the string "true" or "false" and puts a constraint on valid data.  If
+   "mandatory" is "true", at least one node from exactly one of the
+   choice's case branches MUST exist.
+
+   If not specified, the default is "false".
+
+   The behavior of the constraint depends on the type of the choice's
+   closest ancestor node in the schema tree that is not a non-presence
+   container (see Section 7.5.1):
+
+   o  If no such ancestor exists in the schema tree, the constraint is
+      enforced.
+
+   o  Otherwise, if this ancestor is a case node, the constraint is
+      enforced if any other node from the case exists.
+
+   o  Otherwise, it is enforced if the ancestor node exists.
+
+   The constraint is further enforced according to the rules in
+   Section 8.
+
+7.9.5.  XML Encoding Rules
+
+   The choice and case nodes are not visible in XML.
+
+   The child nodes of the selected "case" statement MUST be encoded in
+   the same order as they are defined in the "case" statement if they
+   are part of an RPC or action input or output parameter definition.
+   Otherwise, the subelements are encoded in any order.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7.9.6.  Usage Example
+
+   Given the following choice:
+
+     container protocol {
+       choice name {
+         case a {
+           leaf udp {
+             type empty;
+           }
+         }
+         case b {
+           leaf tcp {
+             type empty;
+           }
+         }
+       }
+     }
+
+   A corresponding XML instance example:
+
+     <protocol>
+       <tcp/>
+     </protocol>
+
+   To change the protocol from TCP to UDP:
+
+     <rpc message-id="101"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+          xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <edit-config>
+         <target>
+           <running/>
+         </target>
+         <config>
+           <system xmlns="urn:example:config">
+             <protocol>
+               <udp nc:operation="create"/>
+             </protocol>
+           </system>
+         </config>
+       </edit-config>
+     </rpc>
+
+
+
+
+
+
+
+
+
+
+
+
+7.10.  The "anydata" Statement
+
+   The "anydata" statement defines an interior node in the schema tree.
+   It takes one argument, which is an identifier, followed by a block of
+   substatements that holds detailed anydata information.
+
+   The "anydata" statement is used to represent an unknown set of nodes
+   that can be modeled with YANG, except anyxml, but for which the data
+   model is not known at module design time.  It is possible, though not
+   required, for the data model for anydata content to become known
+   through protocol signaling or other means that are outside the scope
+   of this document.
+
+   An example of where anydata can be useful is a list of received
+   notifications where the specific notifications are not known at
+   design time.
+
+   An anydata node cannot be augmented (see Section 7.17).
+
+   An anydata node exists in zero or one instance in the data tree.
+
+   An implementation may or may not know the data model used to model a
+   specific instance of an anydata node.
+
+   Since the use of anydata limits the manipulation of the content, the
+   "anydata" statement SHOULD NOT be used to define configuration data.
+
+7.10.1.  The anydata's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | config       | 7.21.1  | 0..1        |
+                 | description  | 7.21.3  | 0..1        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | mandatory    | 7.6.5   | 0..1        |
+                 | must         | 7.5.3   | 0..n        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | when         | 7.21.5  | 0..1        |
+                 +--------------+---------+-------------+
+
+
+
+
+
+
+
+
+
+
+00]
+
+
+
+7.10.2.  XML Encoding Rules
+
+   An anydata node is encoded as an XML element.  The element's local
+   name is the anydata's identifier, and its namespace is the module's
+   XML namespace (see Section 7.1.3).  The value of the anydata node is
+   a set of nodes, which are encoded as XML subelements to the anydata
+   element.
+
+7.10.3.  NETCONF <edit-config> Operations
+
+   An anydata node is treated as an opaque chunk of data.  This data can
+   be modified in its entirety only.
+
+   Any "operation" attributes present on subelements of an anydata node
+   are ignored by the NETCONF server.
+
+   When a NETCONF server processes an <edit-config> request, the
+   elements of procedure for the anydata node are as follows:
+
+   o  If the operation is "merge" or "replace", the node is created if
+      it does not exist, and its value is set to the subelements of the
+      anydata node found in the XML RPC data.
+
+   o  If the operation is "create", the node is created if it does not
+      exist, and its value is set to the subelements of the anydata node
+      found in the XML RPC data.  If the node already exists, a
+      "data-exists" error is returned.
+
+   o  If the operation is "delete", the node is deleted if it exists.
+      If the node does not exist, a "data-missing" error is returned.
+
+7.10.4.  Usage Example
+
+   Given the following "anydata" statement:
+
+     list logged-notification {
+       key time;
+       leaf time {
+         type yang:date-and-time;
+       }
+       anydata data;
+     }
+
+
+
+
+
+
+
+
+
+0
+
+
+
+   The following is a valid encoding of such a list instance:
+
+     <logged-notification>
+       <time>2014-07-29T13:43:12Z</time>
+       <data>
+         <notification
+           xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+           <eventTime>2014-07-29T13:43:01Z</eventTime>
+           <event xmlns="urn:example:event">
+             <event-class>fault</event-class>
+             <reporting-entity>
+               <card>Ethernet0</card>
+             </reporting-entity>
+             <severity>major</severity>
+           </event>
+         </notification>
+       </data>
+     </logged-notification>
+
+7.11.  The "anyxml" Statement
+
+   The "anyxml" statement defines an interior node in the schema tree.
+   It takes one argument, which is an identifier, followed by a block of
+   substatements that holds detailed anyxml information.
+
+   The "anyxml" statement is used to represent an unknown chunk of XML.
+   No restrictions are placed on the XML.  This can be useful, for
+   example, in RPC replies.  An example is the <filter> parameter in the
+   <get-config> operation in NETCONF.
+
+   An anyxml node cannot be augmented (see Section 7.17).
+
+   An anyxml node exists in zero or one instance in the data tree.
+
+   Since the use of anyxml limits the manipulation of the content, the
+   "anyxml" statement SHOULD NOT be used to define configuration data.
+
+   It should be noted that in YANG version 1, "anyxml" was the only
+   statement that could model an unknown hierarchy of data.  In many
+   cases, this unknown hierarchy of data is actually modeled in YANG,
+   but the specific YANG data model is not known at design time.  In
+   these situations, it is RECOMMENDED to use "anydata" (Section 7.10)
+   instead of "anyxml".
+
+
+
+
+
+
+
+
+0
+
+
+
+7.11.1.  The anyxml's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | config       | 7.21.1  | 0..1        |
+                 | description  | 7.21.3  | 0..1        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | mandatory    | 7.6.5   | 0..1        |
+                 | must         | 7.5.3   | 0..n        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | when         | 7.21.5  | 0..1        |
+                 +--------------+---------+-------------+
+
+7.11.2.  XML Encoding Rules
+
+   An anyxml node is encoded as an XML element.  The element's local
+   name is the anyxml's identifier, and its namespace is the module's
+   XML namespace (see Section 7.1.3).  The value of the anyxml node is
+   encoded as XML content of this element.
+
+   Note that any XML prefixes used in the encoding are local to each
+   instance encoding.  This means that the same XML may be encoded
+   differently by different implementations.
+
+7.11.3.  NETCONF <edit-config> Operations
+
+   An anyxml node is treated as an opaque chunk of data.  This data can
+   be modified in its entirety only.
+
+   Any "operation" attributes present on subelements of an anyxml node
+   are ignored by the NETCONF server.
+
+   When a NETCONF server processes an <edit-config> request, the
+   elements of procedure for the anyxml node are as follows:
+
+   o  If the operation is "merge" or "replace", the node is created if
+      it does not exist, and its value is set to the XML content of the
+      anyxml node found in the XML RPC data.
+
+   o  If the operation is "create", the node is created if it does not
+      exist, and its value is set to the XML content of the anyxml node
+      found in the XML RPC data.  If the node already exists, a
+      "data-exists" error is returned.
+
+   o  If the operation is "delete", the node is deleted if it exists.
+      If the node does not exist, a "data-missing" error is returned.
+
+
+
+0
+
+
+
+7.11.4.  Usage Example
+
+   Given the following "anyxml" statement:
+
+     anyxml html-info;
+
+   The following are two valid encodings of the same anyxml value:
+
+      <html-info>
+        <p xmlns="http://www.w3.org/1999/xhtml">
+          This is <em>very</em> cool.
+        </p>
+      </html-info>
+
+      <html-info>
+        <x:p xmlns:x="http://www.w3.org/1999/xhtml">
+          This is <x:em>very</x:em> cool.
+        </x:p>
+      </html-info>
+
+7.12.  The "grouping" Statement
+
+   The "grouping" statement is used to define a reusable block of nodes,
+   which may be used locally in the module or submodule, and by other
+   modules that import from it, according to the rules in Section 5.5.
+   It takes one argument, which is an identifier, followed by a block of
+   substatements that holds detailed grouping information.
+
+   The "grouping" statement is not a data definition statement and, as
+   such, does not define any nodes in the schema tree.
+
+   A grouping is like a "structure" or a "record" in conventional
+   programming languages.
+
+   Once a grouping is defined, it can be referenced in a "uses"
+   statement (see Section 7.13).  A grouping MUST NOT reference itself,
+   neither directly nor indirectly through a chain of other groupings.
+
+   If the grouping is defined at the top level of a YANG module or
+   submodule, the grouping's identifier MUST be unique within the
+   module.
+
+   A grouping is more than just a mechanism for textual substitution;
+   it also defines a collection of nodes.  Identifiers appearing inside
+   the grouping are resolved relative to the scope in which the grouping
+   is defined, not where it is used.  Prefix mappings, type names,
+   grouping names, and extension usage are evaluated in the hierarchy
+
+
+
+
+04]
+
+
+
+   where the "grouping" statement appears.  For extensions, this means
+   that extensions defined as direct children to a "grouping" statement
+   are applied to the grouping itself.
+
+   Note that if a grouping defines an action or a notification node in
+   its hierarchy, then it cannot be used in all contexts.  For example,
+   it cannot be used in an rpc definition.  See Sections 7.15 and 7.16.
+
+7.12.1.  The grouping's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | action       | 7.15    | 0..n        |
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | choice       | 7.9     | 0..n        |
+                 | container    | 7.5     | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | grouping     | 7.12    | 0..n        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | notification | 7.16    | 0..n        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | typedef      | 7.3     | 0..n        |
+                 | uses         | 7.13    | 0..n        |
+                 +--------------+---------+-------------+
+
+7.12.2.  Usage Example
+
+     import ietf-inet-types {
+       prefix "inet";
+     }
+
+     grouping endpoint {
+       description "A reusable endpoint group.";
+       leaf ip {
+         type inet:ip-address;
+       }
+       leaf port {
+         type inet:port-number;
+       }
+     }
+
+
+
+
+
+
+0
+
+
+
+7.13.  The "uses" Statement
+
+   The "uses" statement is used to reference a "grouping" definition.
+   It takes one argument, which is the name of the grouping.
+
+   The effect of a "uses" reference to a grouping is that the nodes
+   defined by the grouping are copied into the current schema tree and
+   are then updated according to the "refine" and "augment" statements.
+
+   The identifiers defined in the grouping are not bound to a namespace
+   until the contents of the grouping are added to the schema tree via a
+   "uses" statement that does not appear inside a "grouping" statement,
+   at which point they are bound to the namespace of the current module.
+
+7.13.1.  The uses's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | augment      | 7.17    | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | refine       | 7.13.2  | 0..n        |
+                 | status       | 7.21.2  | 0..1        |
+                 | when         | 7.21.5  | 0..1        |
+                 +--------------+---------+-------------+
+
+7.13.2.  The "refine" Statement
+
+   Some of the properties of each node in the grouping can be refined
+   with the "refine" statement.  The argument is a string that
+   identifies a node in the grouping.  This node is called the refine's
+   target node.  If a node in the grouping is not present as a target
+   node of a "refine" statement, it is not refined and thus is used
+   exactly as it was defined in the grouping.
+
+   The argument string is a descendant schema node identifier (see
+   Section 6.5).
+
+   The following refinements can be done:
+
+   o  A leaf or choice node may get a default value, or a new default
+      value if it already had one.
+
+   o  A leaf-list node may get a set of default values, or a new set of
+      default values if it already had defaults; i.e., the set of
+      refined default values replaces the defaults already given.
+
+
+
+0
+
+
+
+   o  Any node may get a specialized "description" string.
+
+   o  Any node may get a specialized "reference" string.
+
+   o  Any node may get a different "config" statement.
+
+   o  A leaf, anydata, anyxml, or choice node may get a different
+      "mandatory" statement.
+
+   o  A container node may get a "presence" statement.
+
+   o  A leaf, leaf-list, list, container, anydata, or anyxml node may
+      get additional "must" expressions.
+
+   o  A leaf-list or list node may get a different "min-elements" or
+      "max-elements" statement.
+
+   o  A leaf, leaf-list, list, container, choice, case, anydata, or
+      anyxml node may get additional "if-feature" expressions.
+
+   o  Any node can get refined extensions, if the extension allows
+      refinement.  See Section 7.19 for details.
+
+7.13.3.  XML Encoding Rules
+
+   Each node in the grouping is encoded as if it was defined inline,
+   even if it is imported from another module with another XML
+   namespace.
+
+7.13.4.  Usage Example
+
+   To use the "endpoint" grouping defined in Section 7.12.2 in a
+   definition of an HTTP server in some other module, we can do:
+
+     import example-system {
+       prefix "sys";
+     }
+
+     container http-server {
+       leaf name {
+         type string;
+       }
+       uses sys:endpoint;
+     }
+
+
+
+
+
+
+
+0
+
+
+
+   A corresponding XML instance example:
+
+     <http-server>
+       <name>extern-web</name>
+       <ip>192.0.2.1</ip>
+       <port>80</port>
+     </http-server>
+
+   If port 80 should be the default for the HTTP server, a default can
+   be added:
+
+     container http-server {
+       leaf name {
+         type string;
+       }
+       uses sys:endpoint {
+         refine port {
+           default 80;
+         }
+       }
+     }
+
+   If we want to define a list of servers and each server has "ip" and
+   "port" as keys, we can do:
+
+     list server {
+       key "ip port";
+       leaf name {
+         type string;
+       }
+       uses sys:endpoint;
+     }
+
+   The following is an error:
+
+     container http-server {
+       uses sys:endpoint;
+       leaf ip {          // illegal - same identifier "ip" used twice
+         type string;
+       }
+     }
+
+7.14.  The "rpc" Statement
+
+   The "rpc" statement is used to define an RPC operation.  It takes one
+   argument, which is an identifier, followed by a block of
+   substatements that holds detailed rpc information.  This argument is
+   the name of the RPC.
+
+
+
+0
+
+
+
+   The "rpc" statement defines an rpc node in the schema tree.  Under
+   the rpc node, a schema node with the name "input" and a schema node
+   with the name "output" are also defined.  The nodes "input" and
+   "output" are defined in the module's namespace.
+
+7.14.1.  The rpc's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | description  | 7.21.3  | 0..1        |
+                 | grouping     | 7.12    | 0..n        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | input        | 7.14.2  | 0..1        |
+                 | output       | 7.14.3  | 0..1        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | typedef      | 7.3     | 0..n        |
+                 +--------------+---------+-------------+
+
+7.14.2.  The "input" Statement
+
+   The "input" statement, which is optional, is used to define input
+   parameters to the operation.  It does not take an argument.  The
+   substatements to "input" define nodes under the operation's input
+   node.
+
+   If a leaf in the input tree has a "mandatory" statement with the
+   value "true", the leaf MUST be present in an RPC invocation.
+
+   If a leaf in the input tree has a default value, the server MUST use
+   this value in the same cases as those described in Section 7.6.1.  In
+   these cases, the server MUST operationally behave as if the leaf was
+   present in the RPC invocation with the default value as its value.
+
+   If a leaf-list in the input tree has one or more default values, the
+   server MUST use these values in the same cases as those described in
+   Section 7.7.2.  In these cases, the server MUST operationally behave
+   as if the leaf-list was present in the RPC invocation with the
+   default values as its values.
+
+   Since the input tree is not part of any datastore, all "config"
+   statements for nodes in the input tree are ignored.
+
+   If any node has a "when" statement that would evaluate to "false",
+   then this node MUST NOT be present in the input tree.
+
+
+
+
+
+0
+
+
+
+7.14.2.1.  The input's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | choice       | 7.9     | 0..n        |
+                 | container    | 7.5     | 0..n        |
+                 | grouping     | 7.12    | 0..n        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | must         | 7.5.3   | 0..n        |
+                 | typedef      | 7.3     | 0..n        |
+                 | uses         | 7.13    | 0..n        |
+                 +--------------+---------+-------------+
+
+7.14.3.  The "output" Statement
+
+   The "output" statement, which is optional, is used to define output
+   parameters to the RPC operation.  It does not take an argument.  The
+   substatements to "output" define nodes under the operation's output
+   node.
+
+   If a leaf in the output tree has a "mandatory" statement with the
+   value "true", the leaf MUST be present in an RPC reply.
+
+   If a leaf in the output tree has a default value, the client MUST use
+   this value in the same cases as those described in Section 7.6.1.  In
+   these cases, the client MUST operationally behave as if the leaf was
+   present in the RPC reply with the default value as its value.
+
+   If a leaf-list in the output tree has one or more default values, the
+   client MUST use these values in the same cases as those described in
+   Section 7.7.2.  In these cases, the client MUST operationally behave
+   as if the leaf-list was present in the RPC reply with the default
+   values as its values.
+
+   Since the output tree is not part of any datastore, all "config"
+   statements for nodes in the output tree are ignored.
+
+   If any node has a "when" statement that would evaluate to "false",
+   then this node MUST NOT be present in the output tree.
+
+
+
+
+
+
+
+10]
+
+
+
+7.14.3.1.  The output's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | choice       | 7.9     | 0..n        |
+                 | container    | 7.5     | 0..n        |
+                 | grouping     | 7.12    | 0..n        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | must         | 7.5.3   | 0..n        |
+                 | typedef      | 7.3     | 0..n        |
+                 | uses         | 7.13    | 0..n        |
+                 +--------------+---------+-------------+
+
+7.14.4.  NETCONF XML Encoding Rules
+
+   An rpc node is encoded as a child XML element to the <rpc> element,
+   as designated by the substitution group "rpcOperation" in [RFC624.
+   The element's local name is the rpc's identifier, and its namespace
+   is the module's XML namespace (see Section 7.1.3).
+
+   Input parameters are encoded as child XML elements to the rpc node's
+   XML element, in the same order as they are defined within the "input"
+   statement.
+
+   If the RPC operation invocation succeeded and no output parameters
+   are returned, the <rpc-reply> contains a single <ok/> element defined
+   in [RFC624.  If output parameters are returned, they are encoded as
+   child elements to the <rpc-reply> element defined in [RFC624, in
+   the same order as they are defined within the "output" statement.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1
+
+
+
+7.14.5.  Usage Example
+
+   The following example defines an RPC operation:
+
+     module example-rock {
+       yang-version 1.1;
+       namespace "urn:example:rock";
+       prefix "rock";
+
+       rpc rock-the-house {
+         input {
+           leaf zip-code {
+             type string;
+           }
+         }
+       }
+     }
+
+   A corresponding XML instance example of the complete rpc and
+   rpc-reply:
+
+     <rpc message-id="101"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <rock-the-house xmlns="urn:example:rock">
+         <zip-code>27606-0100</zip-code>
+       </rock-the-house>
+     </rpc>
+
+     <rpc-reply message-id="101"
+                xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <ok/>
+     </rpc-reply>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1
+
+
+
+7.15.  The "action" Statement
+
+   The "action" statement is used to define an operation connected to a
+   specific container or list data node.  It takes one argument, which
+   is an identifier, followed by a block of substatements that holds
+   detailed action information.  The argument is the name of the action.
+
+   The "action" statement defines an action node in the schema tree.
+   Under the action node, a schema node with the name "input" and a
+   schema node with the name "output" are also defined.  The nodes
+   "input" and "output" are defined in the module's namespace.
+
+   An action MUST NOT be defined within an rpc, another action, or a
+   notification, i.e., an action node MUST NOT have an rpc, action, or a
+   notification node as one of its ancestors in the schema tree.  For
+   example, this means that it is an error if a grouping that contains
+   an action somewhere in its node hierarchy is used in a notification
+   definition.
+
+   An action MUST NOT have any ancestor node that is a list node without
+   a "key" statement.
+
+   Since an action cannot be defined at the top level of a module or in
+   a "case" statement, it is an error if a grouping that contains an
+   action at the top of its node hierarchy is used at the top level of a
+   module or in a case definition.
+
+   The difference between an action and an rpc is that an action is tied
+   to a node in the datastore, whereas an rpc is not.  When an action is
+   invoked, the node in the datastore is specified along with the name
+   of the action and the input parameters.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1
+
+
+
+7.15.1.  The action's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | description  | 7.21.3  | 0..1        |
+                 | grouping     | 7.12    | 0..n        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | input        | 7.14.2  | 0..1        |
+                 | output       | 7.14.3  | 0..1        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | typedef      | 7.3     | 0..n        |
+                 +--------------+---------+-------------+
+
+7.15.2.  NETCONF XML Encoding Rules
+
+   When an action is invoked, an element with the local name "action" in
+   the namespace "urn:ietf:params:xml:ns:yang:1" (see Section 5.3.1) is
+   encoded as a child XML element to the <rpc> element defined in
+   [RFC624, as designated by the substitution group "rpcOperation" in
+   [RFC624.
+
+   The <action> element contains a hierarchy of nodes that identifies
+   the node in the datastore.  It MUST contain all containers and list
+   nodes in the direct path from the top level down to the list or
+   container containing the action.  For lists, all key leafs MUST also
+   be included.  The innermost container or list contains an XML element
+   that carries the name of the defined action.  Within this element,
+   the input parameters are encoded as child XML elements, in the same
+   order as they are defined within the "input" statement.
+
+   Only one action can be invoked in one <rpc>.  If more than one action
+   is present in the <rpc>, the server MUST reply with a "bad-element"
+   <error-tag> in the <rpc-error>.
+
+   If the action operation invocation succeeded and no output parameters
+   are returned, the <rpc-reply> contains a single <ok/> element defined
+   in [RFC624.  If output parameters are returned, they are encoded as
+   child elements to the <rpc-reply> element defined in [RFC624, in
+   the same order as they are defined within the "output" statement.
+
+
+
+
+
+
+
+
+
+
+14]
+
+
+
+7.15.3.  Usage Example
+
+   The following example defines an action to reset one server at a
+   server farm:
+
+     module example-server-farm {
+       yang-version 1.1;
+       namespace "urn:example:server-farm";
+       prefix "sfarm";
+
+       import ietf-yang-types {
+         prefix "yang";
+       }
+
+       list server {
+         key name;
+         leaf name {
+           type string;
+         }
+         action reset {
+           input {
+             leaf reset-at {
+               type yang:date-and-time;
+               mandatory true;
+              }
+            }
+            output {
+              leaf reset-finished-at {
+                type yang:date-and-time;
+                mandatory true;
+              }
+            }
+          }
+        }
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1
+
+
+
+   A corresponding XML instance example of the complete rpc and
+   rpc-reply:
+
+     <rpc message-id="101"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <action xmlns="urn:ietf:params:xml:ns:yang:1">
+         <server xmlns="urn:example:server-farm">
+           <name>apache-1</name>
+           <reset>
+             <reset-at>2014-07-29T13:42:00Z</reset-at>
+           </reset>
+         </server>
+       </action>
+     </rpc>
+
+     <rpc-reply message-id="101"
+                xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <reset-finished-at xmlns="urn:example:server-farm">
+         2014-07-29T13:42:12Z
+       </reset-finished-at>
+     </rpc-reply>
+
+7.16.  The "notification" Statement
+
+   The "notification" statement is used to define a notification.  It
+   takes one argument, which is an identifier, followed by a block of
+   substatements that holds detailed notification information.  The
+   "notification" statement defines a notification node in the schema
+   tree.
+
+   A notification can be defined at the top level of a module, or
+   connected to a specific container or list data node in the schema
+   tree.
+
+   A notification MUST NOT be defined within an rpc, action, or another
+   notification, i.e., a notification node MUST NOT have an rpc, action,
+   or a notification node as one of its ancestors in the schema tree.
+   For example, this means that it is an error if a grouping that
+   contains a notification somewhere in its node hierarchy is used in an
+   rpc definition.
+
+   A notification MUST NOT have any ancestor node that is a list node
+   without a "key" statement.
+
+   Since a notification cannot be defined in a "case" statement, it is
+   an error if a grouping that contains a notification at the top of its
+   node hierarchy is used in a case definition.
+
+
+
+
+1
+
+
+
+   If a leaf in the notification tree has a "mandatory" statement with
+   the value "true", the leaf MUST be present in a notification
+   instance.
+
+   If a leaf in the notification tree has a default value, the client
+   MUST use this value in the same cases as those described in
+   Section 7.6.1.  In these cases, the client MUST operationally behave
+   as if the leaf was present in the notification instance with the
+   default value as its value.
+
+   If a leaf-list in the notification tree has one or more default
+   values, the client MUST use these values in the same cases as those
+   described in Section 7.7.2.  In these cases, the client MUST
+   operationally behave as if the leaf-list was present in the
+   notification instance with the default values as its values.
+
+   Since the notification tree is not part of any datastore, all
+   "config" statements for nodes in the notification tree are ignored.
+
+7.16.1.  The notification's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | choice       | 7.9     | 0..n        |
+                 | container    | 7.5     | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | grouping     | 7.12    | 0..n        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | must         | 7.5.3   | 0..n        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | typedef      | 7.3     | 0..n        |
+                 | uses         | 7.13    | 0..n        |
+                 +--------------+---------+-------------+
+
+7.16.2.  NETCONF XML Encoding Rules
+
+   A notification node that is defined on the top level of a module is
+   encoded as a child XML element to the <notification> element defined
+   in "NETCONF Event Notifications" [RFC527.  The element's local name
+   is the notification's identifier, and its namespace is the module's
+   XML namespace (see Section 7.1.3).
+
+
+
+1
+
+
+
+   When a notification node is defined as a child to a data node, the
+   <notification> element defined in [RFC527 contains a hierarchy of
+   nodes that identifies the node in the datastore.  It MUST contain all
+   containers and list nodes from the top level down to the list or
+   container containing the notification.  For lists, all key leafs MUST
+   also be included.  The innermost container or list contains an XML
+   element that carries the name of the defined notification.
+
+   The notification's child nodes are encoded as subelements to the
+   notification node's XML element, in any order.
+
+7.16.3.  Usage Example
+
+   The following example defines a notification at the top level of a
+   module:
+
+     module example-event {
+       yang-version 1.1;
+       namespace "urn:example:event";
+       prefix "ev";
+
+       notification event {
+         leaf event-class {
+           type string;
+         }
+         leaf reporting-entity {
+           type instance-identifier;
+         }
+         leaf severity {
+           type string;
+         }
+       }
+     }
+
+   A corresponding XML instance example of the complete notification:
+
+     <notification
+       xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+       <eventTime>2008-07-08T00:01:00Z</eventTime>
+       <event xmlns="urn:example:event">
+         <event-class>fault</event-class>
+         <reporting-entity>
+           /ex:interface[ex:name='Ethernet0']
+         </reporting-entity>
+         <severity>major</severity>
+       </event>
+     </notification>
+
+
+
+
+1
+
+
+
+   The following example defines a notification in a data node:
+
+     module example-interface-module {
+       yang-version 1.1;
+       namespace "urn:example:interface-module";
+       prefix "if";
+
+       container interfaces {
+         list interface {
+           key "name";
+           leaf name {
+             type string;
+           }
+           notification interface-enabled {
+             leaf by-user {
+               type string;
+             }
+           }
+         }
+       }
+     }
+
+   A corresponding XML instance example of the complete notification:
+
+     <notification
+       xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+       <eventTime>2008-07-08T00:01:00Z</eventTime>
+       <interfaces xmlns="urn:example:interface-module">
+         <interface>
+           <name>eth1</name>
+           <interface-enabled>
+             <by-user>fred</by-user>
+           </interface-enabled>
+         </interface>
+       </interfaces>
+     </notification>
+
+7.17.  The "augment" Statement
+
+   The "augment" statement allows a module or submodule to add to a
+   schema tree defined in an external module, or in the current module
+   and its submodules, and to add to the nodes from a grouping in a
+   "uses" statement.  The argument is a string that identifies a node in
+   the schema tree.  This node is called the augment's target node.  The
+   target node MUST be either a container, list, choice, case, input,
+   output, or notification node.  It is augmented with the nodes defined
+   in the substatements that follow the "augment" statement.
+
+
+
+
+1
+
+
+
+   The argument string is a schema node identifier (see Section 6.5).
+   If the "augment" statement is on the top level in a module or
+   submodule, the absolute form (defined by the rule
+   "absolute-schema-nodeid" in Section 14) of a schema node identifier
+   MUST be used.  If the "augment" statement is a substatement to the
+   "uses" statement, the descendant form (defined by the rule
+   "descendant-schema-nodeid" in Section 14) MUST be used.
+
+   If the target node is a container, list, case, input, output, or
+   notification node, the "container", "leaf", "list", "leaf-list",
+   "uses", and "choice" statements can be used within the "augment"
+   statement.
+
+   If the target node is a container or list node, the "action" and
+   "notification" statements can be used within the "augment" statement.
+
+   If the target node is a choice node, the "case" statement or a
+   shorthand "case" statement (see Section 7.9.2) can be used within the
+   "augment" statement.
+
+   The "augment" statement MUST NOT add multiple nodes with the same
+   name from the same module to the target node.
+
+   If the augmentation adds mandatory nodes (see Section 3) that
+   represent configuration to a target node in another module, the
+   augmentation MUST be made conditional with a "when" statement.  Care
+   must be taken when defining the "when" expression so that clients
+   that do not know about the augmenting module do not break.
+
+   In the following example, it is OK to augment the "interface" entry
+   with "mandatory-leaf" because the augmentation depends on support for
+   "some-new-iftype".  The old client does not know about this type, so
+   it would never select this type and would therefore not be adding a
+   mandatory data node.
+
+     module example-augment {
+       yang-version 1.1;
+       namespace "urn:example:augment";
+       prefix mymod;
+
+       import ietf-interfaces {
+         prefix if;
+       }
+
+       identity some-new-iftype {
+          base if:interface-type;
+       }
+
+
+
+
+20]
+
+
+
+       augment "/if:interfaces/if:interface" {
+          when 'derived-from-or-self(if:type, "mymod:some-new-iftype")';
+
+          leaf mandatory-leaf {
+             mandatory true;
+             type string;
+          }
+       }
+     }
+
+7.17.1.  The augment's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | action       | 7.15    | 0..n        |
+                 | anydata      | 7.10    | 0..n        |
+                 | anyxml       | 7.11    | 0..n        |
+                 | case         | 7.9.2   | 0..n        |
+                 | choice       | 7.9     | 0..n        |
+                 | container    | 7.5     | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | leaf         | 7.6     | 0..n        |
+                 | leaf-list    | 7.7     | 0..n        |
+                 | list         | 7.8     | 0..n        |
+                 | notification | 7.16    | 0..n        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 | uses         | 7.13    | 0..n        |
+                 | when         | 7.21.5  | 0..1        |
+                 +--------------+---------+-------------+
+
+7.17.2.  XML Encoding Rules
+
+   All data nodes defined in the "augment" statement are defined as XML
+   elements in the XML namespace of the module where the "augment" is
+   specified.
+
+   When a node is augmented, the augmenting child nodes are encoded as
+   subelements to the augmented node, in any order.
+
+
+
+
+
+
+
+
+
+
+2
+
+
+
+7.17.3.  Usage Example
+
+   In namespace urn:example:interface-module, we have:
+
+     container interfaces {
+       list ifEntry {
+         key "ifIndex";
+
+         leaf ifIndex {
+           type uint32;
+         }
+         leaf ifDescr {
+           type string;
+         }
+         leaf ifType {
+           type iana:IfType;
+         }
+         leaf ifMtu {
+           type int32;
+         }
+       }
+     }
+
+   Then, in namespace urn:example:ds0, we have:
+
+     import example-interface-module {
+       prefix "if";
+     }
+     augment "/if:interfaces/if:ifEntry" {
+       when "if:ifType='ds0'";
+       leaf ds0ChannelNumber {
+         type ChannelNumber;
+       }
+     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2
+
+
+
+   A corresponding XML instance example:
+
+     <interfaces xmlns="urn:example:interface-module"
+                 xmlns:ds0="urn:example:ds0">
+       <ifEntry>
+         <ifIndex>1</ifIndex>
+         <ifDescr>Flintstone Inc Ethernet A562</ifDescr>
+         <ifType>ethernetCsmacd</ifType>
+         <ifMtu>1500</ifMtu>
+       </ifEntry>
+       <ifEntry>
+         <ifIndex>2</ifIndex>
+         <ifDescr>Flintstone Inc DS0</ifDescr>
+         <ifType>ds0</ifType>
+         <ds0:ds0ChannelNumber>1</ds0:ds0ChannelNumber>
+       </ifEntry>
+     </interfaces>
+
+   As another example, suppose we have the choice defined in
+   Section 7.9.6.  The following construct can be used to extend the
+   protocol definition:
+
+     augment /ex:system/ex:protocol/ex:name {
+       case c {
+         leaf smtp {
+           type empty;
+         }
+       }
+     }
+
+   A corresponding XML instance example:
+
+     <ex:system>
+       <ex:protocol>
+         <ex:tcp/>
+       </ex:protocol>
+     </ex:system>
+
+   or
+
+     <ex:system>
+       <ex:protocol>
+         <other:smtp/>
+       </ex:protocol>
+     </ex:system>
+
+
+
+
+
+
+2
+
+
+
+7.18.  The "identity" Statement
+
+   The "identity" statement is used to define a new globally unique,
+   abstract, and untyped identity.  The identity's only purpose is to
+   denote its name, semantics, and existence.  An identity can be either
+   defined from scratch or derived from one or more base identities.
+   The identity's argument is an identifier that is the name of the
+   identity.  It is followed by a block of substatements that holds
+   detailed identity information.
+
+   The built-in datatype "identityref" (see Section 9.10) can be used to
+   reference identities within a data model.
+
+7.18.1.  The identity's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | base         | 7.18.2  | 0..n        |
+                 | description  | 7.21.3  | 0..1        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 +--------------+---------+-------------+
+
+7.18.2.  The "base" Statement
+
+   The "base" statement, which is optional, takes as an argument a
+   string that is the name of an existing identity, from which the new
+   identity is derived.  If no "base" statement is present, the identity
+   is defined from scratch.  If multiple "base" statements are present,
+   the identity is derived from all of them.
+
+   If a prefix is present on the base name, it refers to an identity
+   defined in the module that was imported with that prefix, or the
+   local module if the prefix matches the local module's prefix.
+   Otherwise, an identity with the matching name MUST be defined in the
+   current module or an included submodule.
+
+   An identity MUST NOT reference itself, neither directly nor
+   indirectly through a chain of other identities.
+
+
+
+
+
+
+
+
+
+
+24]
+
+
+
+   The derivation of identities has the following properties:
+
+   o  It is irreflexive, which means that an identity is not derived
+      from itself.
+
+   o  It is transitive, which means that if identity B is derived from A
+      and C is derived from B, then C is also derived from A.
+
+7.18.3.  Usage Example
+
+     module example-crypto-base {
+       yang-version 1.1;
+       namespace "urn:example:crypto-base";
+       prefix "crypto";
+
+       identity crypto-alg {
+         description
+           "Base identity from which all crypto algorithms
+            are derived.";
+       }
+
+       identity symmetric-key {
+         description
+           "Base identity used to identify symmetric-key crypto
+            algorithms.";
+         }
+
+       identity public-key {
+         description
+           "Base identity used to identify public-key crypto
+            algorithms.";
+         }
+     }
+
+     module example-des {
+       yang-version 1.1;
+       namespace "urn:example:des";
+       prefix "des";
+
+       import "example-crypto-base" {
+         prefix "crypto";
+       }
+
+       identity des {
+         base "crypto:crypto-alg";
+         base "crypto:symmetric-key";
+         description "DES crypto algorithm.";
+       }
+
+
+
+2
+
+
+
+       identity des3 {
+         base "crypto:crypto-alg";
+         base "crypto:symmetric-key";
+         description "Triple DES crypto algorithm.";
+       }
+     }
+
+7.19.  The "extension" Statement
+
+   The "extension" statement allows the definition of new statements
+   within the YANG language.  This new statement definition can be
+   imported and used by other modules.
+
+   The "extension" statement's argument is an identifier that is the new
+   keyword for the extension and must be followed by a block of
+   substatements that holds detailed extension information.  The purpose
+   of the "extension" statement is to define a keyword so that it can be
+   imported and used by other modules.
+
+   The extension can be used like a normal YANG statement, with the
+   statement name followed by an argument if one is defined by the
+   "extension" statement, and an optional block of substatements.  The
+   statement's name is created by combining the prefix of the module in
+   which the extension was defined, a colon (":"), and the extension's
+   keyword, with no interleaving whitespace.  The substatements of an
+   extension are defined by the "extension" statement, using some
+   mechanism outside the scope of this specification.  Syntactically,
+   the substatements MUST be YANG statements, including extensions
+   defined using "extension" statements.  YANG statements in extensions
+   MUST follow the syntactical rules in Section 14.
+
+   An extension can allow refinement (see Section 7.13.2) and deviations
+   (Section 7.20.3.2), but the mechanism for how this is defined is
+   outside the scope of this specification.
+
+7.19.1.  The extension's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | argument     | 7.19.2  | 0..1        |
+                 | description  | 7.21.3  | 0..1        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 +--------------+---------+-------------+
+
+
+
+
+
+
+2
+
+
+
+7.19.2.  The "argument" Statement
+
+   The "argument" statement, which is optional, takes as an argument a
+   string that is the name of the argument to the keyword.  If no
+   "argument" statement is present, the keyword expects no argument when
+   it is used.
+
+   The argument's name is used in the YIN mapping, where it is used as
+   an XML attribute or element name, depending on the argument's
+   "yin-element" statement.
+
+7.19.2.1.  The argument's Substatement
+
+                 +--------------+----------+-------------+
+                 | substatement | section  | cardinality |
+                 +--------------+----------+-------------+
+                 | yin-element  | 7.19.2.2 | 0..1        |
+                 +--------------+----------+-------------+
+
+7.19.2.2.  The "yin-element" Statement
+
+   The "yin-element" statement, which is optional, takes as an argument
+   the string "true" or "false".  This statement indicates whether the
+   argument is mapped to an XML element in YIN or to an XML attribute
+   (see Section 13).
+
+   If no "yin-element" statement is present, it defaults to "false".
+
+7.19.3.  Usage Example
+
+   To define an extension:
+
+     module example-extensions {
+       yang-version 1.1;
+       ...
+
+       extension c-define {
+         description
+           "Takes as an argument a name string.
+            Makes the code generator use the given name
+            in the #define.";
+         argument "name";
+       }
+     }
+
+
+
+
+
+
+
+2
+
+
+
+   To use the extension:
+
+     module example-interfaces {
+       yang-version 1.1;
+
+       ...
+       import example-extensions {
+         prefix "myext";
+       }
+       ...
+
+       container interfaces {
+         ...
+         myext:c-define "MY_INTERFACES";
+       }
+     }
+
+7.20.  Conformance-Related Statements
+
+   This section defines statements related to conformance, as described
+   in Section 5.6.
+
+7.20.1.  The "feature" Statement
+
+   The "feature" statement is used to define a mechanism by which
+   portions of the schema are marked as conditional.  A feature name is
+   defined that can later be referenced using the "if-feature" statement
+   (see Section 7.20.2).  Schema nodes tagged with an "if-feature"
+   statement are ignored by the server unless the server supports the
+   given feature expression.  This allows portions of the YANG module to
+   be conditional based on conditions in the server.  The model can
+   represent the abilities of the server within the model, giving a
+   richer model that allows for differing server abilities and roles.
+
+   The argument to the "feature" statement is the name of the new
+   feature and follows the rules for identifiers in Section 6.2.  This
+   name is used by the "if-feature" statement to tie the schema nodes to
+   the feature.
+
+
+
+
+
+
+
+
+
+
+
+
+
+2
+
+
+
+   In this example, a feature called "local-storage" represents the
+   ability for a server to store syslog messages on local storage of
+   some sort.  This feature is used to make the "local-storage-limit"
+   leaf conditional on the presence of some sort of local storage.  If
+   the server does not report that it supports this feature, the
+   "local-storage-limit" node is not supported.
+
+     module example-syslog {
+       yang-version 1.1;
+
+       ...
+       feature local-storage {
+         description
+           "This feature means that the server supports local
+            storage (memory, flash, or disk) that can be used to
+            store syslog messages.";
+       }
+
+       container syslog {
+         leaf local-storage-limit {
+           if-feature local-storage;
+           type uint64;
+           units "kilobyte";
+           config false;
+           description
+             "The amount of local storage that can be
+              used to hold syslog messages.";
+         }
+       }
+     }
+
+   The "if-feature" statement can be used in many places within the YANG
+   syntax.  Definitions tagged with "if-feature" are ignored when the
+   server does not support that feature.
+
+   A feature MUST NOT reference itself, neither directly nor indirectly
+   through a chain of other features.
+
+   In order for a server to support a feature that is dependent on any
+   other features (i.e., the feature has one or more "if-feature"
+   substatements), the server MUST also support all the dependent
+   features.
+
+
+
+
+
+
+
+
+
+2
+
+
+
+7.20.1.1.  The feature's Substatements
+
+                 +--------------+---------+-------------+
+                 | substatement | section | cardinality |
+                 +--------------+---------+-------------+
+                 | description  | 7.21.3  | 0..1        |
+                 | if-feature   | 7.20.2  | 0..n        |
+                 | reference    | 7.21.4  | 0..1        |
+                 | status       | 7.21.2  | 0..1        |
+                 +--------------+---------+-------------+
+
+7.20.2.  The "if-feature" Statement
+
+   The "if-feature" statement makes its parent statement conditional.
+   The argument is a boolean expression over feature names.  In this
+   expression, a feature name evaluates to "true" if and only if the
+   feature is supported by the server.  The parent statement is
+   implemented by servers where the boolean expression evaluates to
+   "true".
+
+   The if-feature boolean expression syntax is formally defined by the
+   rule "if-feature-expr" in Section 14.  Parentheses are used to group
+   expressions.  When the expression is evaluated, the order of
+   precedence is (highest precedence first): grouping (parentheses),
+   "not", "and", "or".
+
+   If a prefix is present on a feature name in the boolean expression,
+   the prefixed name refers to a feature defined in the module that was
+   imported with that prefix, or the local module if the prefix matches
+   the local module's prefix.  Otherwise, a feature with the matching
+   name MUST be defined in the current module or an included submodule.
+
+   A leaf that is a list key MUST NOT have any "if-feature" statements.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+30]
+
+
+
+7.20.2.1.  Usage Example
+
+   In this example, the container "target" is implemented if either the
+   "outbound-tls" or "outbound-ssh" feature is supported by the server.
+
+     container target {
+       if-feature "outbound-tls or outbound-ssh";
+       ...
+     }
+
+   The following examples are equivalent:
+
+     if-feature "not foo or bar and baz";
+
+     if-feature "(not foo) or (bar and baz)";
+
+7.20.3.  The "deviation" Statement
+
+   The "deviation" statement defines a hierarchy of a module that the
+   server does not implement faithfully.  The argument is a string that
+   identifies the node in the schema tree where a deviation from the
+   module occurs.  This node is called the deviation's target node.  The
+   contents of the "deviation" statement give details about the
+   deviation.
+
+   The argument string is an absolute schema node identifier (see
+   Section 6.5).
+
+   Deviations define the way a server or class of servers deviate from a
+   standard.  This means that deviations MUST never be part of a
+   published standard, since they are the mechanism for learning how
+   implementations vary from the standards.
+
+   Server deviations are strongly discouraged and MUST only be used as a
+   last resort.  Telling the application how a server fails to follow a
+   standard is no substitute for implementing the standard correctly.  A
+   server that deviates from a module is not fully compliant with the
+   module.
+
+   However, in some cases, a particular device may not have the hardware
+   or software ability to support parts of a standard module.  When this
+   occurs, the server makes a choice to either treat attempts to
+   configure unsupported parts of the module as an error that is
+   reported back to the unsuspecting application or ignore those
+   incoming requests.  Neither choice is acceptable.
+
+
+
+
+
+
+3
+
+
+
+   Instead, YANG allows servers to document portions of a base module
+   that are not supported, or that are supported but with different
+   syntax, by using the "deviation" statement.
+
+   After applying all deviations announced by a server, in any order,
+   the resulting data model MUST still be valid.
+
+7.20.3.1.  The deviation's Substatements
+
+                 +--------------+----------+-------------+
+                 | substatement | section  | cardinality |
+                 +--------------+----------+-------------+
+                 | description  | 7.21.3   | 0..1        |
+                 | deviate      | 7.20.3.2 | 1..n        |
+                 | reference    | 7.21.4   | 0..1        |
+                 +--------------+----------+-------------+
+
+7.20.3.2.  The "deviate" Statement
+
+   The "deviate" statement defines how the server's implementation of
+   the target node deviates from its original definition.  The argument
+   is one of the strings "not-supported", "add", "replace", or "delete".
+
+   The argument "not-supported" indicates that the target node is not
+   implemented by this server.
+
+   The argument "add" adds properties to the target node.  The
+   properties to add are identified by substatements to the "deviate"
+   statement.  If a property can only appear once, the property MUST NOT
+   exist in the target node.
+
+   The argument "replace" replaces properties of the target node.  The
+   properties to replace are identified by substatements to the
+   "deviate" statement.  The properties to replace MUST exist in the
+   target node.
+
+   The argument "delete" deletes properties from the target node.  The
+   properties to delete are identified by substatements to the "delete"
+   statement.  The substatement's keyword MUST match a corresponding
+   keyword in the target node, and the argument's string MUST be equal
+   to the corresponding keyword's argument string in the target node.
+
+
+
+
+
+
+
+
+
+
+3
+
+
+
+               +--------------+--------------+-------------+
+               | substatement | section      | cardinality |
+               +--------------+--------------+-------------+
+               | config       | 7.21.1       | 0..1        |
+               | default      | 7.6.4, 7.7.4 | 0..n        |
+               | mandatory    | 7.6.5        | 0..1        |
+               | max-elements | 7.7.6        | 0..1        |
+               | min-elements | 7.7.5        | 0..1        |
+               | must         | 7.5.3        | 0..n        |
+               | type         | 7.4          | 0..1        |
+               | unique       | 7.8.3        | 0..n        |
+               | units        | 7.3.3        | 0..1        |
+               +--------------+--------------+-------------+
+
+                        The deviate's Substatements
+
+   If the target node has a property defined by an extension, this
+   property can be deviated if the extension allows deviations.  See
+   Section 7.19 for details.
+
+7.20.3.3.  Usage Example
+
+   In this example, the server is informing client applications that it
+   does not support the "daytime" service in the style of RFC 867.
+
+     module example-deviations {
+       yang-version 1.1;
+       namespace "urn:example:deviations";
+       prefix md;
+
+       import example-base {
+         prefix base;
+       }
+
+       deviation /base:system/base:daytime {
+         deviate not-supported;
+       }
+       ...
+     }
+
+   A server would advertise both modules "example-base" and
+   "example-deviations".
+
+
+
+
+
+
+
+
+
+3
+
+
+
+   The following example sets a server-specific default value to a leaf
+   that does not have a default value defined:
+
+     deviation /base:system/base:user/base:type {
+       deviate add {
+         default "admin"; // new users are 'admin' by default
+       }
+     }
+
+   In this example, the server limits the number of name servers to 3:
+
+     deviation /base:system/base:name-server {
+       deviate replace {
+         max-elements 3;
+       }
+     }
+
+   If the original definition is:
+
+     container system {
+       must "daytime or time";
+       ...
+     }
+
+   a server might remove this "must" constraint by doing:
+
+     deviation /base:system {
+       deviate delete {
+         must "daytime or time";
+       }
+     }
+
+7.21.  Common Statements
+
+   This section defines substatements common to several other
+   statements.
+
+7.21.1.  The "config" Statement
+
+   The "config" statement takes as an argument the string "true" or
+   "false".  If "config" is "true", the definition represents
+   configuration.  Data nodes representing configuration are part of
+   configuration datastores.
+
+   If "config" is "false", the definition represents state data.  Data
+   nodes representing state data are not part of configuration
+   datastores.
+
+
+
+
+34]
+
+
+
+   If "config" is not specified, the default is the same as the parent
+   schema node's "config" value.  If the parent node is a case node, the
+   value is the same as the case node's parent choice node.
+
+   If the top node does not specify a "config" statement, the default is
+   "true".
+
+   If a node has "config" set to "false", no node underneath it can have
+   "config" set to "true".
+
+7.21.2.  The "status" Statement
+
+   The "status" statement takes as an argument one of the strings
+   "current", "deprecated", or "obsolete".
+
+   o  "current" means that the definition is current and valid.
+
+   o  "deprecated" indicates an obsolete definition, but it permits
+      new/continued implementation in order to foster interoperability
+      with older/existing implementations.
+
+   o  "obsolete" means that the definition is obsolete and SHOULD NOT be
+      implemented and/or can be removed from implementations.
+
+   If no status is specified, the default is "current".
+
+   If a definition is "current", it MUST NOT reference a "deprecated" or
+   "obsolete" definition within the same module.
+
+   If a definition is "deprecated", it MUST NOT reference an "obsolete"
+   definition within the same module.
+
+   For example, the following is illegal:
+
+     typedef my-type {
+       status deprecated;
+       type int32;
+     }
+
+     leaf my-leaf {
+       status current;
+       type my-type; // illegal, since my-type is deprecated
+     }
+
+
+
+
+
+
+
+
+3
+
+
+
+7.21.3.  The "description" Statement
+
+   The "description" statement takes as an argument a string that
+   contains a human-readable textual description of this definition.
+   The text is provided in a language (or languages) chosen by the
+   module developer; for the sake of interoperability, it is RECOMMENDED
+   to choose a language that is widely understood among the community of
+   network administrators who will use the module.
+
+7.21.4.  The "reference" Statement
+
+   The "reference" statement takes as an argument a string that is a
+   human-readable cross-reference to an external document -- either
+   another module that defines related management information or a
+   document that provides additional information relevant to this
+   definition.
+
+   For example, a typedef for a "uri" data type could look like:
+
+     typedef uri {
+       type string;
+       reference
+         "RFC 3986: Uniform Resource Identifier (URI): Generic Syntax";
+       ...
+     }
+
+7.21.5.  The "when" Statement
+
+   The "when" statement makes its parent data definition statement
+   conditional.  The node defined by the parent data definition
+   statement is only valid when the condition specified by the "when"
+   statement is satisfied.  The statement's argument is an XPath
+   expression (see Section 6.4), which is used to formally specify this
+   condition.  If the XPath expression conceptually evaluates to "true"
+   for a particular instance, then the node defined by the parent data
+   definition statement is valid; otherwise, it is not.
+
+   A leaf that is a list key MUST NOT have a "when" statement.
+
+   If a key leaf is defined in a grouping that is used in a list, the
+   "uses" statement MUST NOT have a "when" statement.
+
+   See Section 8.3.2 for additional information.
+
+
+
+
+
+
+
+
+3
+
+
+
+   The XPath expression is conceptually evaluated in the following
+   context, in addition to the definition in Section 6.4.1:
+
+   o  If the "when" statement is a child of an "augment" statement, then
+      the context node is the augment's target node in the data tree, if
+      the target node is a data node.  Otherwise, the context node is
+      the closest ancestor node to the target node that is also a data
+      node.  If no such node exists, the context node is the root node.
+      The accessible tree is tentatively altered during the processing
+      of the XPath expression by removing all instances (if any) of the
+      nodes added by the "augment" statement.
+
+   o  If the "when" statement is a child of a "uses", "choice", or
+      "case" statement, then the context node is the closest ancestor
+      node to the node with the "when" statement that is also a data
+      node.  If no such node exists, the context node is the root node.
+      The accessible tree is tentatively altered during the processing
+      of the XPath expression by removing all instances (if any) of the
+      nodes added by the "uses", "choice", or "case" statement.
+
+   o  If the "when" statement is a child of any other data definition
+      statement, the accessible tree is tentatively altered during the
+      processing of the XPath expression by replacing all instances of
+      the data node for which the "when" statement is defined with a
+      single dummy node with the same name, but with no value and no
+      children.  If no such instance exists, the dummy node is
+      tentatively created.  The context node is this dummy node.
+
+   The result of the XPath expression is converted to a boolean value
+   using the standard XPath rules.
+
+   If the XPath expression references any node that also has associated
+   "when" statements, those "when" expressions MUST be evaluated first.
+   There MUST NOT be any circular dependencies among "when" expressions.
+
+   Note that the XPath expression is conceptually evaluated.  This means
+   that an implementation does not have to use an XPath evaluator in the
+   server.  The "when" statement can very well be implemented with
+   specially written code.
+
+
+
+
+
+
+
+
+
+
+
+
+3
+
+
+
+8.  Constraints
+
+8.1.  Constraints on Data
+
+   Several YANG statements define constraints on valid data.  These
+   constraints are enforced in different ways, depending on what type of
+   data the statement defines.
+
+   o  If the constraint is defined on configuration data, it MUST be
+      true in a valid configuration data tree.
+
+   o  If the constraint is defined on state data, it MUST be true in a
+      valid state data tree.
+
+   o  If the constraint is defined on notification content, it MUST be
+      true in any notification data tree.
+
+   o  If the constraint is defined on RPC or action input parameters, it
+      MUST be true in an invocation of the RPC or action operation.
+
+   o  If the constraint is defined on RPC or action output parameters,
+      it MUST be true in the RPC or action reply.
+
+   The following properties are true in all data trees:
+
+   o  All leaf data values MUST match the type constraints for the leaf,
+      including those defined in the type's "range", "length", and
+      "pattern" properties.
+
+   o  All key leafs MUST be present for all list entries.
+
+   o  Nodes MUST be present for at most one case branch in all choices.
+
+   o  There MUST be no nodes tagged with "if-feature" present if the
+      "if-feature" expression evaluates to "false" in the server.
+
+   o  There MUST be no nodes tagged with "when" present if the "when"
+      condition evaluates to "false" in the data tree.
+
+   The following properties are true in a valid data tree:
+
+   o  All "must" constraints MUST evaluate to "true".
+
+   o  All referential integrity constraints defined via the "path"
+      statement MUST be satisfied.
+
+   o  All "unique" constraints on lists MUST be satisfied.
+
+
+
+
+3
+
+
+
+   o  The "mandatory" constraint is enforced for leafs and choices,
+      unless the node or any of its ancestors has a "when" condition or
+      "if-feature" expression that evaluates to "false".
+
+   o  The "min-elements" and "max-elements" constraints are enforced for
+      lists and leaf-lists, unless the node or any of its ancestors has
+      a "when" condition or "if-feature" expression that evaluates to
+      "false".
+
+   The running configuration datastore MUST always be valid.
+
+8.2.  Configuration Data Modifications
+
+   o  If a request creates configuration data nodes under a choice, any
+      existing nodes from other case branches in the data tree are
+      deleted by the server.
+
+   o  If a request modifies a configuration data node such that any
+      node's "when" expression becomes false, then the node in the data
+      tree with the "when" expression is deleted by the server.
+
+8.3.  NETCONF Constraint Enforcement Model
+
+   For configuration data, there are three windows when constraints MUST
+   be enforced:
+
+   o  during parsing of RPC payloads
+
+   o  during processing of the <edit-config> operation
+
+   o  during validation
+
+   Each of these scenarios is considered in the following sections.
+
+8.3.1.  Payload Parsing
+
+   When content arrives in RPC payloads, it MUST be well-formed XML,
+   following the hierarchy and content rules defined by the set of
+   models the server implements.
+
+   o  If a leaf data value does not match the type constraints for the
+      leaf, including those defined in the type's "range", "length", and
+      "pattern" properties, the server MUST reply with an
+      "invalid-value" <error-tag> in the <rpc-error>, and with the
+      error-app-tag (Section 7.5.4.2) and error-message
+      (Section 7.5.4.1) associated with the constraint, if any exist.
+
+
+
+
+
+3
+
+
+
+   o  If all keys of a list entry are not present, the server MUST reply
+      with a "missing-element" <error-tag> in the <rpc-error>.
+
+   o  If data for more than one case branch of a choice is present, the
+      server MUST reply with a "bad-element" <error-tag> in the
+      <rpc-error>.
+
+   o  If data for a node tagged with "if-feature" is present and the
+      "if-feature" expression evaluates to "false" in the server, the
+      server MUST reply with an "unknown-element" <error-tag> in the
+      <rpc-error>.
+
+   o  If data for a node tagged with "when" is present and the "when"
+      condition evaluates to "false", the server MUST reply with an
+      "unknown-element" <error-tag> in the <rpc-error>.
+
+   o  For insert handling, if the values for the attributes "before" and
+      "after" are not valid for the type of the appropriate key leafs,
+      the server MUST reply with a "bad-attribute" <error-tag> in the
+      <rpc-error>.
+
+   o  If the attributes "before" and "after" appear in any element that
+      is not a list whose "ordered-by" property is "user", the server
+      MUST reply with an "unknown-attribute" <error-tag> in the
+      <rpc-error>.
+
+8.3.2.  NETCONF <edit-config> Processing
+
+   After the incoming data is parsed, the NETCONF server performs the
+   <edit-config> operation by applying the data to the configuration
+   datastore.  During this processing, the following errors MUST be
+   detected:
+
+   o  Delete requests for non-existent data.
+
+   o  Create requests for existent data.
+
+   o  Insert requests with "before" or "after" parameters that do not
+      exist.
+
+   o  Modification requests for nodes tagged with "when", and the "when"
+      condition evaluates to "false".  In this case, the server MUST
+      reply with an "unknown-element" <error-tag> in the <rpc-error>.
+
+
+
+
+
+
+
+
+40]
+
+
+
+8.3.3.  Validation
+
+   When datastore processing is complete, the final contents MUST obey
+   all validation constraints.  This validation processing is performed
+   at differing times according to the datastore.  If the datastore is
+   "running" or "startup", these constraints MUST be enforced at the end
+   of the <edit-config> or <copy-config> operation.  If the datastore is
+   "candidate", the constraint enforcement is delayed until a <commit>
+   or <validate> operation takes place.
+
+
+14.  YANG ABNF Grammar
+
+   In YANG, almost all statements are unordered.  The ABNF grammar
+   [RFC5234] [RFC740 defines the canonical order.  To improve module
+   readability, it is RECOMMENDED that clauses be entered in this order.
+
+   Within the ABNF grammar, unordered statements are marked with
+   comments.
+
+   This grammar assumes that the scanner replaces YANG comments with a
+   single space character.
+
+   <CODE BEGINS> file "yang.abnf"
+
+   module-stmt         = optsep module-keyword sep identifier-arg-str
+                         optsep
+                         "{" stmtsep
+                             module-header-stmts
+                             linkage-stmts
+                             meta-stmts
+                             revision-stmts
+                             body-stmts
+                         "}" optsep
+
+   submodule-stmt      = optsep submodule-keyword sep identifier-arg-str
+                         optsep
+                         "{" stmtsep
+                             submodule-header-stmts
+                             linkage-stmts
+                             meta-stmts
+                             revision-stmts
+                             body-stmts
+                         "}" optsep
+
+   module-header-stmts = ;; these stmts can appear in any order
+                         yang-version-stmt
+                         namespace-stmt
+                         prefix-stmt
+
+   submodule-header-stmts =
+                         ;; these stmts can appear in any order
+                         yang-version-stmt
+                         belongs-to-stmt
+
+
+
+
+
+
+
+
+84]
+
+
+
+   meta-stmts          = ;; these stmts can appear in any order
+                         [organization-stmt]
+                         [contact-stmt]
+                         [description-stmt]
+                         [reference-stmt]
+
+   linkage-stmts       = ;; these stmts can appear in any order
+                         *import-stmt
+                         *include-stmt
+
+   revision-stmts      = *revision-stmt
+
+   body-stmts          = *(extension-stmt /
+                           feature-stmt /
+                           identity-stmt /
+                           typedef-stmt /
+                           grouping-stmt /
+                           data-def-stmt /
+                           augment-stmt /
+                           rpc-stmt /
+                           notification-stmt /
+                           deviation-stmt)
+
+   data-def-stmt       = container-stmt /
+                         leaf-stmt /
+                         leaf-list-stmt /
+                         list-stmt /
+                         choice-stmt /
+                         anydata-stmt /
+                         anyxml-stmt /
+                         uses-stmt
+
+   yang-version-stmt   = yang-version-keyword sep yang-version-arg-str
+                         stmtend
+
+   yang-version-arg-str = < a string that matches the rule >
+                          < yang-version-arg >
+
+   yang-version-arg    = "1.1"
+
+   import-stmt         = import-keyword sep identifier-arg-str optsep
+                         "{" stmtsep
+                             ;; these stmts can appear in any order
+                             prefix-stmt
+                             [revision-date-stmt]
+                             [description-stmt]
+                             [reference-stmt]
+                         "}" stmtsep
+
+
+
+8
+
+
+
+   include-stmt        = include-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [revision-date-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                          "}") stmtsep
+
+   namespace-stmt      = namespace-keyword sep uri-str stmtend
+
+   uri-str             = < a string that matches the rule >
+                         < URI in RFC 3986 >
+
+   prefix-stmt         = prefix-keyword sep prefix-arg-str stmtend
+
+   belongs-to-stmt     = belongs-to-keyword sep identifier-arg-str
+                         optsep
+                         "{" stmtsep
+                             prefix-stmt
+                         "}" stmtsep
+
+   organization-stmt   = organization-keyword sep string stmtend
+
+   contact-stmt        = contact-keyword sep string stmtend
+
+   description-stmt    = description-keyword sep string stmtend
+
+   reference-stmt      = reference-keyword sep string stmtend
+
+   units-stmt          = units-keyword sep string stmtend
+
+   revision-stmt       = revision-keyword sep revision-date optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [description-stmt]
+                              [reference-stmt]
+                          "}") stmtsep
+
+   revision-date       = date-arg-str
+
+   revision-date-stmt  = revision-date-keyword sep revision-date stmtend
+
+
+
+
+
+
+
+
+8
+
+
+
+   extension-stmt      = extension-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [argument-stmt]
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                          "}") stmtsep
+
+   argument-stmt       = argument-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              [yin-element-stmt]
+                          "}") stmtsep
+
+   yin-element-stmt    = yin-element-keyword sep yin-element-arg-str
+                         stmtend
+
+   yin-element-arg-str = < a string that matches the rule >
+                         < yin-element-arg >
+
+   yin-element-arg     = true-keyword / false-keyword
+
+   identity-stmt       = identity-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              *if-feature-stmt
+                              *base-stmt
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                          "}") stmtsep
+
+   base-stmt           = base-keyword sep identifier-ref-arg-str
+                         stmtend
+
+   feature-stmt        = feature-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              *if-feature-stmt
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                          "}") stmtsep
+
+
+
+
+8
+
+
+
+   if-feature-stmt     = if-feature-keyword sep if-feature-expr-str
+                         stmtend
+
+   if-feature-expr-str = < a string that matches the rule >
+                         < if-feature-expr >
+
+   if-feature-expr     = if-feature-term
+                           [sep or-keyword sep if-feature-expr]
+
+   if-feature-term     = if-feature-factor
+                           [sep and-keyword sep if-feature-term]
+
+   if-feature-factor   = not-keyword sep if-feature-factor /
+                         "(" optsep if-feature-expr optsep ")" /
+                         identifier-ref-arg
+
+   typedef-stmt        = typedef-keyword sep identifier-arg-str optsep
+                         "{" stmtsep
+                             ;; these stmts can appear in any order
+                             type-stmt
+                             [units-stmt]
+                             [default-stmt]
+                             [status-stmt]
+                             [description-stmt]
+                             [reference-stmt]
+                          "}" stmtsep
+
+   type-stmt           = type-keyword sep identifier-ref-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              [type-body-stmts]
+                          "}") stmtsep
+
+   type-body-stmts     = numerical-restrictions /
+                         decimal64-specification /
+                         string-restrictions /
+                         enum-specification /
+                         leafref-specification /
+                         identityref-specification /
+                         instance-identifier-specification /
+                         bits-specification /
+                         union-specification /
+                         binary-specification
+
+
+
+
+
+
+
+
+8
+
+
+
+   numerical-restrictions = [range-stmt]
+
+   range-stmt          = range-keyword sep range-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [error-message-stmt]
+                              [error-app-tag-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                           "}") stmtsep
+
+   decimal64-specification = ;; these stmts can appear in any order
+                             fraction-digits-stmt
+                             [range-stmt]
+
+   fraction-digits-stmt = fraction-digits-keyword sep
+                          fraction-digits-arg-str stmtend
+
+   fraction-digits-arg-str = < a string that matches the rule >
+                             < fraction-digits-arg >
+
+   fraction-digits-arg = ("1" ["0" / "1" / "2" / "3" / "4" /
+                               "5" / "6" / "7" / "8"])
+                         / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9"
+
+   string-restrictions = ;; these stmts can appear in any order
+                         [length-stmt]
+                         *pattern-stmt
+
+   length-stmt         = length-keyword sep length-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [error-message-stmt]
+                              [error-app-tag-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                           "}") stmtsep
+
+
+
+
+
+
+
+
+
+
+
+
+8
+
+
+
+   pattern-stmt        = pattern-keyword sep string optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [modifier-stmt]
+                              [error-message-stmt]
+                              [error-app-tag-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                           "}") stmtsep
+
+   modifier-stmt       = modifier-keyword sep modifier-arg-str stmtend
+
+   modifier-arg-str    = < a string that matches the rule >
+                         < modifier-arg >
+
+   modifier-arg        = invert-match-keyword
+
+   default-stmt        = default-keyword sep string stmtend
+
+   enum-specification  = 1*enum-stmt
+
+   enum-stmt           = enum-keyword sep string optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              *if-feature-stmt
+                              [value-stmt]
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                           "}") stmtsep
+
+   leafref-specification =
+                         ;; these stmts can appear in any order
+                         path-stmt
+                         [require-instance-stmt]
+
+   path-stmt           = path-keyword sep path-arg-str stmtend
+
+   require-instance-stmt = require-instance-keyword sep
+                            require-instance-arg-str stmtend
+
+   require-instance-arg-str = < a string that matches the rule >
+                              < require-instance-arg >
+
+   require-instance-arg = true-keyword / false-keyword
+
+
+
+
+90]
+
+
+
+   instance-identifier-specification =
+                         [require-instance-stmt]
+
+   identityref-specification =
+                         1*base-stmt
+
+   union-specification = 1*type-stmt
+
+   binary-specification = [length-stmt]
+
+   bits-specification  = 1*bit-stmt
+
+   bit-stmt            = bit-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              *if-feature-stmt
+                              [position-stmt]
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                          "}") stmtsep
+
+   position-stmt       = position-keyword sep
+                         position-value-arg-str stmtend
+
+   position-value-arg-str = < a string that matches the rule >
+                            < position-value-arg >
+
+   position-value-arg  = non-negative-integer-value
+
+   status-stmt         = status-keyword sep status-arg-str stmtend
+
+   status-arg-str      = < a string that matches the rule >
+                         < status-arg >
+
+   status-arg          = current-keyword /
+                         obsolete-keyword /
+                         deprecated-keyword
+
+   config-stmt         = config-keyword sep
+                         config-arg-str stmtend
+
+   config-arg-str      = < a string that matches the rule >
+                         < config-arg >
+
+   config-arg          = true-keyword / false-keyword
+
+
+
+
+9
+
+
+
+   mandatory-stmt      = mandatory-keyword sep
+                         mandatory-arg-str stmtend
+
+   mandatory-arg-str   = < a string that matches the rule >
+                         < mandatory-arg >
+
+   mandatory-arg       = true-keyword / false-keyword
+
+   presence-stmt       = presence-keyword sep string stmtend
+
+   ordered-by-stmt     = ordered-by-keyword sep
+                         ordered-by-arg-str stmtend
+
+   ordered-by-arg-str  = < a string that matches the rule >
+                         < ordered-by-arg >
+
+   ordered-by-arg      = user-keyword / system-keyword
+
+   must-stmt           = must-keyword sep string optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [error-message-stmt]
+                              [error-app-tag-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                           "}") stmtsep
+
+   error-message-stmt  = error-message-keyword sep string stmtend
+
+   error-app-tag-stmt  = error-app-tag-keyword sep string stmtend
+
+   min-elements-stmt   = min-elements-keyword sep
+                         min-value-arg-str stmtend
+
+   min-value-arg-str   = < a string that matches the rule >
+                         < min-value-arg >
+
+   min-value-arg       = non-negative-integer-value
+
+   max-elements-stmt   = max-elements-keyword sep
+                         max-value-arg-str stmtend
+
+   max-value-arg-str   = < a string that matches the rule >
+                         < max-value-arg >
+
+   max-value-arg       = unbounded-keyword /
+                         positive-integer-value
+
+
+
+9
+
+
+
+   value-stmt          = value-keyword sep integer-value-str stmtend
+
+   integer-value-str   = < a string that matches the rule >
+                         < integer-value >
+
+   grouping-stmt       = grouping-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                              *(typedef-stmt / grouping-stmt)
+                              *data-def-stmt
+                              *action-stmt
+                              *notification-stmt
+                          "}") stmtsep
+
+   container-stmt      = container-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [when-stmt]
+                              *if-feature-stmt
+                              *must-stmt
+                              [presence-stmt]
+                              [config-stmt]
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                              *(typedef-stmt / grouping-stmt)
+                              *data-def-stmt
+                              *action-stmt
+                              *notification-stmt
+                          "}") stmtsep
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9
+
+
+
+   leaf-stmt           = leaf-keyword sep identifier-arg-str optsep
+                         "{" stmtsep
+                             ;; these stmts can appear in any order
+                             [when-stmt]
+                             *if-feature-stmt
+                             type-stmt
+                             [units-stmt]
+                             *must-stmt
+                             [default-stmt]
+                             [config-stmt]
+                             [mandatory-stmt]
+                             [status-stmt]
+                             [description-stmt]
+                             [reference-stmt]
+                          "}" stmtsep
+
+   leaf-list-stmt      = leaf-list-keyword sep identifier-arg-str optsep
+                         "{" stmtsep
+                             ;; these stmts can appear in any order
+                             [when-stmt]
+                             *if-feature-stmt
+                             type-stmt stmtsep
+                             [units-stmt]
+                             *must-stmt
+                             *default-stmt
+                             [config-stmt]
+                             [min-elements-stmt]
+                             [max-elements-stmt]
+                             [ordered-by-stmt]
+                             [status-stmt]
+                             [description-stmt]
+                             [reference-stmt]
+                          "}" stmtsep
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+94]
+
+
+
+   list-stmt           = list-keyword sep identifier-arg-str optsep
+                         "{" stmtsep
+                             ;; these stmts can appear in any order
+                             [when-stmt]
+                             *if-feature-stmt
+                             *must-stmt
+                             [key-stmt]
+                             *unique-stmt
+                             [config-stmt]
+                             [min-elements-stmt]
+                             [max-elements-stmt]
+                             [ordered-by-stmt]
+                             [status-stmt]
+                             [description-stmt]
+                             [reference-stmt]
+                             *(typedef-stmt / grouping-stmt)
+                             1*data-def-stmt
+                             *action-stmt
+                             *notification-stmt
+                          "}" stmtsep
+
+   key-stmt            = key-keyword sep key-arg-str stmtend
+
+   key-arg-str         = < a string that matches the rule >
+                         < key-arg >
+
+   key-arg             = node-identifier *(sep node-identifier)
+
+   unique-stmt         = unique-keyword sep unique-arg-str stmtend
+
+   unique-arg-str      = < a string that matches the rule >
+                         < unique-arg >
+
+   unique-arg          = descendant-schema-nodeid
+                         *(sep descendant-schema-nodeid)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9
+
+
+
+   choice-stmt         = choice-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [when-stmt]
+                              *if-feature-stmt
+                              [default-stmt]
+                              [config-stmt]
+                              [mandatory-stmt]
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                              *(short-case-stmt / case-stmt)
+                          "}") stmtsep
+
+   short-case-stmt     = choice-stmt /
+                         container-stmt /
+                         leaf-stmt /
+                         leaf-list-stmt /
+                         list-stmt /
+                         anydata-stmt /
+                         anyxml-stmt
+
+   case-stmt           = case-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [when-stmt]
+                              *if-feature-stmt
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                              *data-def-stmt
+                          "}") stmtsep
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9
+
+
+
+   anydata-stmt        = anydata-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [when-stmt]
+                              *if-feature-stmt
+                              *must-stmt
+                              [config-stmt]
+                              [mandatory-stmt]
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                           "}") stmtsep
+
+   anyxml-stmt         = anyxml-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [when-stmt]
+                              *if-feature-stmt
+                              *must-stmt
+                              [config-stmt]
+                              [mandatory-stmt]
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                           "}") stmtsep
+
+   uses-stmt           = uses-keyword sep identifier-ref-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [when-stmt]
+                              *if-feature-stmt
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                              *refine-stmt
+                              *uses-augment-stmt
+                          "}") stmtsep
+
+
+
+
+
+
+
+
+
+
+
+9
+
+
+
+   refine-stmt         = refine-keyword sep refine-arg-str optsep
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              *if-feature-stmt
+                              *must-stmt
+                              [presence-stmt]
+                              *default-stmt
+                              [config-stmt]
+                              [mandatory-stmt]
+                              [min-elements-stmt]
+                              [max-elements-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                            "}" stmtsep
+
+   refine-arg-str      = < a string that matches the rule >
+                         < refine-arg >
+
+   refine-arg          = descendant-schema-nodeid
+
+   uses-augment-stmt   = augment-keyword sep uses-augment-arg-str optsep
+                         "{" stmtsep
+                             ;; these stmts can appear in any order
+                             [when-stmt]
+                             *if-feature-stmt
+                             [status-stmt]
+                             [description-stmt]
+                             [reference-stmt]
+                             1*(data-def-stmt / case-stmt /
+                                action-stmt / notification-stmt)
+                          "}" stmtsep
+
+   uses-augment-arg-str = < a string that matches the rule >
+                          < uses-augment-arg >
+
+   uses-augment-arg    = descendant-schema-nodeid
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9
+
+
+
+   augment-stmt        = augment-keyword sep augment-arg-str optsep
+                         "{" stmtsep
+                             ;; these stmts can appear in any order
+                             [when-stmt]
+                             *if-feature-stmt
+                             [status-stmt]
+                             [description-stmt]
+                             [reference-stmt]
+                             1*(data-def-stmt / case-stmt /
+                                action-stmt / notification-stmt)
+                          "}" stmtsep
+
+   augment-arg-str     = < a string that matches the rule >
+                         < augment-arg >
+
+   augment-arg         = absolute-schema-nodeid
+
+   when-stmt           = when-keyword sep string optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [description-stmt]
+                              [reference-stmt]
+                           "}") stmtsep
+
+   rpc-stmt            = rpc-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              *if-feature-stmt
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                              *(typedef-stmt / grouping-stmt)
+                              [input-stmt]
+                              [output-stmt]
+                          "}") stmtsep
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9
+
+
+
+   action-stmt         = action-keyword sep identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              *if-feature-stmt
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                              *(typedef-stmt / grouping-stmt)
+                              [input-stmt]
+                              [output-stmt]
+                          "}") stmtsep
+
+   input-stmt          = input-keyword optsep
+                         "{" stmtsep
+                             ;; these stmts can appear in any order
+                             *must-stmt
+                             *(typedef-stmt / grouping-stmt)
+                             1*data-def-stmt
+                         "}" stmtsep
+
+   output-stmt         = output-keyword optsep
+                         "{" stmtsep
+                             ;; these stmts can appear in any order
+                             *must-stmt
+                             *(typedef-stmt / grouping-stmt)
+                             1*data-def-stmt
+                         "}" stmtsep
+
+   notification-stmt   = notification-keyword sep
+                         identifier-arg-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              *if-feature-stmt
+                              *must-stmt
+                              [status-stmt]
+                              [description-stmt]
+                              [reference-stmt]
+                              *(typedef-stmt / grouping-stmt)
+                              *data-def-stmt
+                          "}") stmtsep
+
+
+
+
+
+
+
+
+
+00]
+
+
+
+   deviation-stmt      = deviation-keyword sep
+                         deviation-arg-str optsep
+                         "{" stmtsep
+                             ;; these stmts can appear in any order
+                             [description-stmt]
+                             [reference-stmt]
+                             (deviate-not-supported-stmt /
+                               1*(deviate-add-stmt /
+                                  deviate-replace-stmt /
+                                  deviate-delete-stmt))
+                         "}" stmtsep
+
+   deviation-arg-str   = < a string that matches the rule >
+                         < deviation-arg >
+
+   deviation-arg       = absolute-schema-nodeid
+
+   deviate-not-supported-stmt =
+                         deviate-keyword sep
+                         not-supported-keyword-str stmtend
+
+   deviate-add-stmt    = deviate-keyword sep add-keyword-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [units-stmt]
+                              *must-stmt
+                              *unique-stmt
+                              *default-stmt
+                              [config-stmt]
+                              [mandatory-stmt]
+                              [min-elements-stmt]
+                              [max-elements-stmt]
+                          "}") stmtsep
+
+   deviate-delete-stmt = deviate-keyword sep delete-keyword-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [units-stmt]
+                              *must-stmt
+                              *unique-stmt
+                              *default-stmt
+                          "}") stmtsep
+
+
+
+
+
+
+
+0
+
+
+
+   deviate-replace-stmt = deviate-keyword sep replace-keyword-str optsep
+                         (";" /
+                          "{" stmtsep
+                              ;; these stmts can appear in any order
+                              [type-stmt]
+                              [units-stmt]
+                              [default-stmt]
+                              [config-stmt]
+                              [mandatory-stmt]
+                              [min-elements-stmt]
+                              [max-elements-stmt]
+                          "}") stmtsep
+
+   not-supported-keyword-str = < a string that matches the rule >
+                               < not-supported-keyword >
+
+   add-keyword-str     = < a string that matches the rule >
+                         < add-keyword >
+
+   delete-keyword-str  = < a string that matches the rule >
+                         < delete-keyword >
+
+   replace-keyword-str = < a string that matches the rule >
+                         < replace-keyword >
+
+   ;; represents the usage of an extension
+   unknown-statement   = prefix ":" identifier [sep string] optsep
+                         (";" /
+                          "{" optsep
+                              *((yang-stmt / unknown-statement) optsep)
+                           "}") stmtsep
+
+   yang-stmt           = action-stmt /
+                         anydata-stmt /
+                         anyxml-stmt /
+                         argument-stmt /
+                         augment-stmt /
+                         base-stmt /
+                         belongs-to-stmt /
+                         bit-stmt /
+                         case-stmt /
+                         choice-stmt /
+                         config-stmt /
+                         contact-stmt /
+                         container-stmt /
+                         default-stmt /
+                         description-stmt /
+                         deviate-add-stmt /
+
+
+
+0
+
+
+
+                         deviate-delete-stmt /
+                         deviate-not-supported-stmt /
+                         deviate-replace-stmt /
+                         deviation-stmt /
+                         enum-stmt /
+                         error-app-tag-stmt /
+                         error-message-stmt /
+                         extension-stmt /
+                         feature-stmt /
+                         fraction-digits-stmt /
+                         grouping-stmt /
+                         identity-stmt /
+                         if-feature-stmt /
+                         import-stmt /
+                         include-stmt /
+                         input-stmt /
+                         key-stmt /
+                         leaf-list-stmt /
+                         leaf-stmt /
+                         length-stmt /
+                         list-stmt /
+                         mandatory-stmt /
+                         max-elements-stmt /
+                         min-elements-stmt /
+                         modifier-stmt /
+                         module-stmt /
+                         must-stmt /
+                         namespace-stmt /
+                         notification-stmt /
+                         ordered-by-stmt /
+                         organization-stmt /
+                         output-stmt /
+                         path-stmt /
+                         pattern-stmt /
+                         position-stmt /
+                         prefix-stmt /
+                         presence-stmt /
+                         range-stmt /
+                         reference-stmt /
+                         refine-stmt /
+                         require-instance-stmt /
+                         revision-date-stmt /
+                         revision-stmt /
+                         rpc-stmt /
+                         status-stmt /
+                         submodule-stmt /
+                         typedef-stmt /
+                         type-stmt /
+
+
+
+0
+
+
+
+                         unique-stmt /
+                         units-stmt /
+                         uses-augment-stmt /
+                         uses-stmt /
+                         value-stmt /
+                         when-stmt /
+                         yang-version-stmt /
+                         yin-element-stmt
+
+   ;; Ranges
+
+   range-arg-str       = < a string that matches the rule >
+                         < range-arg >
+
+   range-arg           = range-part *(optsep "|" optsep range-part)
+
+   range-part          = range-boundary
+                         [optsep ".." optsep range-boundary]
+
+   range-boundary      = min-keyword / max-keyword /
+                         integer-value / decimal-value
+
+   ;; Lengths
+
+   length-arg-str      = < a string that matches the rule >
+                         < length-arg >
+
+   length-arg          = length-part *(optsep "|" optsep length-part)
+
+   length-part         = length-boundary
+                         [optsep ".." optsep length-boundary]
+
+   length-boundary     = min-keyword / max-keyword /
+                         non-negative-integer-value
+
+   ;; Date
+
+   date-arg-str        = < a string that matches the rule >
+                         < date-arg >
+
+   date-arg            = 4DIGIT "-" 2DIGIT "-" 2DIGIT
+
+   ;; Schema Node Identifiers
+
+   schema-nodeid       = absolute-schema-nodeid /
+                         descendant-schema-nodeid
+
+   absolute-schema-nodeid = 1*("/" node-identifier)
+
+
+
+04]
+
+
+
+   descendant-schema-nodeid =
+                         node-identifier
+                         [absolute-schema-nodeid]
+
+   node-identifier     = [prefix ":"] identifier
+
+   ;; Instance Identifiers
+
+   instance-identifier = 1*("/" (node-identifier
+                                 [1*key-predicate /
+                                  leaf-list-predicate /
+                                  pos]))
+
+   key-predicate       = "[" *WSP key-predicate-expr *WSP "]"
+
+   key-predicate-expr  = node-identifier *WSP "=" *WSP quoted-string
+
+   leaf-list-predicate = "[" *WSP leaf-list-predicate-expr *WSP "]"
+
+   leaf-list-predicate-expr = "." *WSP "=" *WSP quoted-string
+
+   pos                 = "[" *WSP positive-integer-value *WSP "]"
+
+   quoted-string       = (DQUOTE string DQUOTE) / (SQUOTE string SQUOTE)
+
+   ;; leafref path
+
+   path-arg-str        = < a string that matches the rule >
+                         < path-arg >
+
+   path-arg            = absolute-path / relative-path
+
+   absolute-path       = 1*("/" (node-identifier *path-predicate))
+
+   relative-path       = 1*("../") descendant-path
+
+   descendant-path     = node-identifier
+                         [*path-predicate absolute-path]
+
+   path-predicate      = "[" *WSP path-equality-expr *WSP "]"
+
+   path-equality-expr  = node-identifier *WSP "=" *WSP path-key-expr
+
+   path-key-expr       = current-function-invocation *WSP "/" *WSP
+                         rel-path-keyexpr
+
+
+
+
+
+
+0
+
+
+
+   rel-path-keyexpr    = 1*(".." *WSP "/" *WSP)
+                         *(node-identifier *WSP "/" *WSP)
+                         node-identifier
+
+   ;;; Keywords, using the syntax for case-sensitive strings (RFC 7405)
+
+   ;; statement keywords
+   action-keyword           = %s"action"
+   anydata-keyword          = %s"anydata"
+   anyxml-keyword           = %s"anyxml"
+   argument-keyword         = %s"argument"
+   augment-keyword          = %s"augment"
+   base-keyword             = %s"base"
+   belongs-to-keyword       = %s"belongs-to"
+   bit-keyword              = %s"bit"
+   case-keyword             = %s"case"
+   choice-keyword           = %s"choice"
+   config-keyword           = %s"config"
+   contact-keyword          = %s"contact"
+   container-keyword        = %s"container"
+   default-keyword          = %s"default"
+   description-keyword      = %s"description"
+   deviate-keyword          = %s"deviate"
+   deviation-keyword        = %s"deviation"
+   enum-keyword             = %s"enum"
+   error-app-tag-keyword    = %s"error-app-tag"
+   error-message-keyword    = %s"error-message"
+   extension-keyword        = %s"extension"
+   feature-keyword          = %s"feature"
+   fraction-digits-keyword  = %s"fraction-digits"
+   grouping-keyword         = %s"grouping"
+   identity-keyword         = %s"identity"
+   if-feature-keyword       = %s"if-feature"
+   import-keyword           = %s"import"
+   include-keyword          = %s"include"
+   input-keyword            = %s"input"
+   key-keyword              = %s"key"
+   leaf-keyword             = %s"leaf"
+   leaf-list-keyword        = %s"leaf-list"
+   length-keyword           = %s"length"
+   list-keyword             = %s"list"
+   mandatory-keyword        = %s"mandatory"
+   max-elements-keyword     = %s"max-elements"
+   min-elements-keyword     = %s"min-elements"
+   modifier-keyword         = %s"modifier"
+   module-keyword           = %s"module"
+   must-keyword             = %s"must"
+   namespace-keyword        = %s"namespace"
+
+
+
+0
+
+
+
+   notification-keyword     = %s"notification"
+   ordered-by-keyword       = %s"ordered-by"
+   organization-keyword     = %s"organization"
+   output-keyword           = %s"output"
+   path-keyword             = %s"path"
+   pattern-keyword          = %s"pattern"
+   position-keyword         = %s"position"
+   prefix-keyword           = %s"prefix"
+   presence-keyword         = %s"presence"
+   range-keyword            = %s"range"
+   reference-keyword        = %s"reference"
+   refine-keyword           = %s"refine"
+   require-instance-keyword = %s"require-instance"
+   revision-keyword         = %s"revision"
+   revision-date-keyword    = %s"revision-date"
+   rpc-keyword              = %s"rpc"
+   status-keyword           = %s"status"
+   submodule-keyword        = %s"submodule"
+   type-keyword             = %s"type"
+   typedef-keyword          = %s"typedef"
+   unique-keyword           = %s"unique"
+   units-keyword            = %s"units"
+   uses-keyword             = %s"uses"
+   value-keyword            = %s"value"
+   when-keyword             = %s"when"
+   yang-version-keyword     = %s"yang-version"
+   yin-element-keyword      = %s"yin-element"
+
+   ;; other keywords
+
+   add-keyword              = %s"add"
+   current-keyword          = %s"current"
+   delete-keyword           = %s"delete"
+   deprecated-keyword       = %s"deprecated"
+   false-keyword            = %s"false"
+   invert-match-keyword     = %s"invert-match"
+   max-keyword              = %s"max"
+   min-keyword              = %s"min"
+   not-supported-keyword    = %s"not-supported"
+   obsolete-keyword         = %s"obsolete"
+   replace-keyword          = %s"replace"
+   system-keyword           = %s"system"
+   true-keyword             = %s"true"
+   unbounded-keyword        = %s"unbounded"
+   user-keyword             = %s"user"
+
+
+
+
+
+
+0
+
+
+
+   and-keyword              = %s"and"
+   or-keyword               = %s"or"
+   not-keyword              = %s"not"
+
+   current-function-invocation = current-keyword *WSP "(" *WSP ")"
+
+   ;;; Basic Rules
+
+   prefix-arg-str      = < a string that matches the rule >
+                         < prefix-arg >
+
+   prefix-arg          = prefix
+
+   prefix              = identifier
+
+   identifier-arg-str  = < a string that matches the rule >
+                         < identifier-arg >
+
+   identifier-arg      = identifier
+
+   identifier          = (ALPHA / "_")
+                         *(ALPHA / DIGIT / "_" / "-" / ".")
+
+   identifier-ref-arg-str = < a string that matches the rule >
+                            < identifier-ref-arg >
+
+   identifier-ref-arg  = identifier-ref
+
+   identifier-ref      = [prefix ":"] identifier
+
+   string              = < an unquoted string, as returned by >
+                         < the scanner, that matches the rule >
+                         < yang-string >
+
+   yang-string         = *yang-char
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0
+
+
+
+   ;; any Unicode or ISO/IEC 10646 character, including tab, carriage
+   ;; return, and line feed but excluding the other C0 control
+   ;; characters, the surrogate blocks, and the noncharacters
+   yang-char = %x09 / %x0A / %x0D / %x20-D7FF /
+                               ; exclude surrogate blocks %xD800-DFFF
+              %xE000-FDCF /    ; exclude noncharacters %xFDD0-FDEF
+              %xFDF0-FFFD /    ; exclude noncharacters %xFFFE-FFFF
+              %x10000-1FFFD /  ; exclude noncharacters %x1FFFE-1FFFF
+              %x20000-2FFFD /  ; exclude noncharacters %x2FFFE-2FFFF
+              %x30000-3FFFD /  ; exclude noncharacters %x3FFFE-3FFFF
+              %x40000-4FFFD /  ; exclude noncharacters %x4FFFE-4FFFF
+              %x50000-5FFFD /  ; exclude noncharacters %x5FFFE-5FFFF
+              %x60000-6FFFD /  ; exclude noncharacters %x6FFFE-6FFFF
+              %x70000-7FFFD /  ; exclude noncharacters %x7FFFE-7FFFF
+              %x80000-8FFFD /  ; exclude noncharacters %x8FFFE-8FFFF
+              %x90000-9FFFD /  ; exclude noncharacters %x9FFFE-9FFFF
+              %xA0000-AFFFD /  ; exclude noncharacters %xAFFFE-AFFFF
+              %xB0000-BFFFD /  ; exclude noncharacters %xBFFFE-BFFFF
+              %xC0000-CFFFD /  ; exclude noncharacters %xCFFFE-CFFFF
+              %xD0000-DFFFD /  ; exclude noncharacters %xDFFFE-DFFFF
+              %xE0000-EFFFD /  ; exclude noncharacters %xEFFFE-EFFFF
+              %xF0000-FFFFD /  ; exclude noncharacters %xFFFFE-FFFFF
+              %x100000-10FFFD  ; exclude noncharacters %x10FFFE-10FFFF
+
+   integer-value       = ("-" non-negative-integer-value) /
+                          non-negative-integer-value
+
+   non-negative-integer-value = "0" / positive-integer-value
+
+   positive-integer-value = (non-zero-digit *DIGIT)
+
+   zero-integer-value  = 1*DIGIT
+
+   stmtend             = optsep (";" / "{" stmtsep "}") stmtsep
+
+   sep                 = 1*(WSP / line-break)
+                         ; unconditional separator
+
+   optsep              = *(WSP / line-break)
+
+   stmtsep             = *(WSP / line-break / unknown-statement)
+
+   line-break          = CRLF / LF
+
+   non-zero-digit      = %x31-39
+
+   decimal-value       = integer-value ("." zero-integer-value)
+
+
+
+
+0
+
+
+
+   SQUOTE              = %x27
+                         ; single quote
+
+   ;;; core rules from RFC 5234
+
+   ALPHA               = %x41-5A / %x61-7A
+                         ; A-Z / a-z
+
+   CR                  = %x0D
+                         ; carriage return
+
+   CRLF                = CR LF
+                         ; Internet standard newline
+
+   DIGIT               = %x30-39
+                         ; 0-9
+
+   DQUOTE              = %x22
+                         ; double quote
+
+   HTAB                = %x09
+                         ; horizontal tab
+
+   LF                  = %x0A
+                         ; line feed
+
+   SP                  = %x20
+                         ; space
+
+   WSP                 = SP / HTAB
+                         ; whitespace
+
+   <CODE ENDS>

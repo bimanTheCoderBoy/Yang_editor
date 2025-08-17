@@ -1,0 +1,2221 @@
+{
+  "metadata": {
+    "source_files": [
+      "rfc7950.txt",
+      "rfc7952.txt",
+      "rfc8407.txt"
+    ],
+    "created_on": "2025-08-14T10:37:22.026356Z",
+    "generator": "Assistant merge of RFC7950 grammar + RFC7952 & RFC8407 compliance rules"
+  },
+  "yang_statements": [
+    {
+      "name": "module",
+      "intent": "Top-level schema container that defines a namespace, top-level data nodes, types, identities, features, RPCs, notifications, actions (via groupings/uses), and revisions.",
+      "syntax": "module <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "yang-version",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "namespace",
+          "cardinality": "1"
+        },
+        {
+          "name": "prefix",
+          "cardinality": "1"
+        },
+        {
+          "name": "import",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "include",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "organization",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "contact",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "revision",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "identity",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "typedef",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "grouping",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "container",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "leaf",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "leaf-list",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "list",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "choice",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "anydata",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "anyxml",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "augment",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "rpc",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "notification",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "deviation",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "extension",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "action",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [
+        "Exactly one 'namespace' and one 'prefix'.",
+        "Identifier must be unique across modules in the implementation.",
+        "A module SHOULD have at least one 'revision'."
+      ],
+      "applies_to": [
+        "top-level"
+      ],
+      "examples": [
+        "module example { namespace \"urn:ex\"; prefix ex; description \"Demo\"; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "submodule",
+      "intent": "Secondary compilation unit whose contents are included into a module via 'include'.",
+      "syntax": "submodule <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "yang-version",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "belongs-to",
+          "cardinality": "1"
+        },
+        {
+          "name": "include",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "import",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "organization",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "contact",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "revision",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "identity",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "typedef",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "grouping",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "container",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "leaf",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "leaf-list",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "list",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "choice",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "anydata",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "anyxml",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "augment",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "rpc",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "notification",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "extension",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "action",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [
+        "'belongs-to' must reference the owning module's identifier.",
+        "A submodule cannot define 'namespace' or 'prefix'."
+      ],
+      "applies_to": [
+        "top-level"
+      ],
+      "examples": [
+        "submodule example-sub { belongs-to example { prefix ex; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "container",
+      "intent": "Non-leaf node that can hold child nodes; may be 'presence' or non-presence (structural).",
+      "syntax": "container <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "when",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "must",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "presence",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "config",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "typedef",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "grouping",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "container|leaf|leaf-list|list|choice|anydata|anyxml",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "action",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "notification",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [
+        "Non-presence container exists if any child exists; 'presence' marks it as explicitly creatable.",
+        "'config false' containers cannot contain 'config true' descendants."
+      ],
+      "applies_to": [
+        "module",
+        "submodule",
+        "grouping",
+        "augment",
+        "case"
+      ],
+      "examples": [
+        "container system { presence \"enable system\"; config true; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "leaf",
+      "intent": "Holds a single scalar value; no child nodes.",
+      "syntax": "leaf <identifier> { type <type-spec>; [default <value>;] ... }",
+      "substatements": [
+        {
+          "name": "type",
+          "cardinality": "1"
+        },
+        {
+          "name": "units",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "must",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "default",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "config",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "mandatory",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "when",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [
+        "Exactly one 'type'.",
+        "'default' value MUST conform to the type.",
+        "If 'mandatory true', 'default' MUST NOT be present.",
+        "'config false' leaves cannot have 'default'."
+      ],
+      "applies_to": [
+        "module",
+        "container",
+        "list",
+        "choice",
+        "case",
+        "grouping",
+        "augment"
+      ],
+      "examples": [
+        "leaf hostname { type string; mandatory true; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "leaf-list",
+      "intent": "An unordered or ordered-by list of scalar values.",
+      "syntax": "leaf-list <identifier> { type <type-spec>; ... }",
+      "substatements": [
+        {
+          "name": "type",
+          "cardinality": "1"
+        },
+        {
+          "name": "units",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "must",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "min-elements",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "max-elements",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "ordered-by",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "config",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "when",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [
+        "Exactly one 'type'.",
+        "'min-elements' <= 'max-elements' if both present.",
+        "If 'ordered-by user' then server maintains user order."
+      ],
+      "applies_to": [
+        "module",
+        "container",
+        "list",
+        "choice",
+        "case",
+        "grouping",
+        "augment"
+      ],
+      "examples": [
+        "leaf-list dns-servers { type inet:ip-address; ordered-by user; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "list",
+      "intent": "A sequence of entries (keyed or unkeyed) that can hold child nodes.",
+      "syntax": "list <identifier> { [key <key-leaf-list>;] ... }",
+      "substatements": [
+        {
+          "name": "key",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "unique",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "min-elements",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "max-elements",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "ordered-by",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "when",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "must",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "config",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "typedef",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "grouping",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "container|leaf|leaf-list|list|choice|anydata|anyxml",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "action",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "notification",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [
+        "Keyed lists: key leafs MUST be 'config true', 'mandatory true' is implied, and those leafs MUST NOT have 'default'.",
+        "Unkeyed lists cannot be 'ordered-by user' unless server defines creation order semantics.",
+        "'min-elements' <= 'max-elements' if both present.",
+        "'unique' enforces tuple uniqueness across specified leafs."
+      ],
+      "applies_to": [
+        "module",
+        "container",
+        "list",
+        "choice",
+        "case",
+        "grouping",
+        "augment"
+      ],
+      "examples": [
+        "list interface { key \"name\"; leaf name { type string; } leaf mtu { type uint16; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "choice",
+      "intent": "Mutually exclusive selection among cases.",
+      "syntax": "choice <identifier> { [default <case-identifier>;] ... }",
+      "substatements": [
+        {
+          "name": "case",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "default",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "when",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "mandatory",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [
+        "Only one case may be present at a time.",
+        "If 'mandatory true' then exactly one case must be set.",
+        "Default case MAY be specified if non-mandatory."
+      ],
+      "applies_to": [
+        "container",
+        "list",
+        "case",
+        "grouping",
+        "augment",
+        "module"
+      ],
+      "examples": [
+        "choice auth-method { case password { leaf pwd { type string; } } case key { leaf key { type binary; } } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "typedef",
+      "intent": "Defines a new derived type name from an existing base type with optional restrictions.",
+      "syntax": "typedef <identifier> { type <base-type-spec>; ... }",
+      "substatements": [
+        {
+          "name": "type",
+          "cardinality": "1"
+        },
+        {
+          "name": "units",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "default",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [
+        "'default' MUST conform to the (possibly restricted) type.",
+        "Restrictions (length/range/pattern/etc.) apply anywhere the typedef is used."
+      ],
+      "applies_to": [
+        "module",
+        "submodule",
+        "grouping"
+      ],
+      "examples": [
+        "typedef port { type uint16 { range 1..65535; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "type",
+      "intent": "Assigns a built-in or derived type to a leaf/leaf-list or inside typedef.",
+      "syntax": "type <built-in-or-derived> { [restriction-substatements]; }",
+      "substatements": [
+        {
+          "name": "range|length",
+          "cardinality": "0..n",
+          "notes": "numeric/string constraints"
+        },
+        {
+          "name": "pattern",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "fraction-digits",
+          "cardinality": "0..1",
+          "notes": "decimal64"
+        },
+        {
+          "name": "bit",
+          "cardinality": "0..n",
+          "notes": "bits type only"
+        },
+        {
+          "name": "enum",
+          "cardinality": "0..n",
+          "notes": "enumeration type only"
+        },
+        {
+          "name": "path",
+          "cardinality": "1 for leafref",
+          "notes": "leafref only"
+        },
+        {
+          "name": "require-instance",
+          "cardinality": "0..1",
+          "notes": "instance-identifier/leafref"
+        },
+        {
+          "name": "base",
+          "cardinality": "1..n for identityref",
+          "notes": "identityref only"
+        }
+      ],
+      "constraints": [
+        "Restriction statements MUST be compatible with the base type.",
+        "Multiple 'pattern' are ANDed; multiple ranges/lengths are unioned by bars.",
+        "For leafref: 'path' is mandatory; target leaf type compatibility is required."
+      ],
+      "applies_to": [
+        "leaf",
+        "leaf-list",
+        "typedef"
+      ],
+      "examples": [
+        "leaf id { type uint32 { range 1..max; } }",
+        "leaf name { type string { pattern '[a-z]([a-z0-9-]*[a-z0-9])?'; } }",
+        "leaf next-hop { type leafref { path '/rt:routes/rt:route/rt:nhop'; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "must",
+      "intent": "XPath-based semantic constraint that must evaluate to true() in valid data.",
+      "syntax": "must <xpath-expr> { [error-message <text>;] [error-app-tag <tag>;] ... }",
+      "substatements": [
+        {
+          "name": "error-message",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "error-app-tag",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [
+        "XPath is evaluated in the context of the node where 'must' appears.",
+        "All 'must' expressions on a node must hold for instance data to be valid."
+      ],
+      "applies_to": [
+        "container",
+        "leaf",
+        "leaf-list",
+        "list",
+        "choice",
+        "case",
+        "anydata",
+        "anyxml",
+        "typedef (default value check)"
+      ],
+      "examples": [
+        "leaf percentage { type uint8; must '. <= 100'; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "when",
+      "intent": "Conditional schema node presence/control based on XPath expression.",
+      "syntax": "when <xpath-expr> { ... }",
+      "substatements": [
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [
+        "If the 'when' condition is false, the node and its subtree are not valid/present.",
+        "Evaluated relative to the node with the 'when'."
+      ],
+      "applies_to": [
+        "container",
+        "leaf",
+        "leaf-list",
+        "list",
+        "choice",
+        "case",
+        "uses",
+        "augment",
+        "anydata",
+        "anyxml"
+      ],
+      "examples": [
+        "leaf password { when \"../method = 'password'\"; type string; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "if-feature",
+      "intent": "Feature-guard for schema nodes/types; node is present only if feature is supported.",
+      "syntax": "if-feature <feature-expr>",
+      "substatements": [],
+      "constraints": [
+        "Feature expression can include 'and', 'or', and 'not'.",
+        "Servers advertise supported features; clients must not rely on nodes guarded by unsupported features."
+      ],
+      "applies_to": [
+        "most schema nodes and typedef/type restrictions"
+      ],
+      "examples": [
+        "leaf jumbo-mtu { if-feature jumbo; type uint32; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "grouping",
+      "intent": "Defines a reusable collection of schema nodes and statements, which can be inserted elsewhere with 'uses'.",
+      "syntax": "grouping <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "typedef",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "grouping",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "container|leaf|leaf-list|list|choice|anydata|anyxml",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "action",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "notification",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [
+        "Groupings do not exist in the data tree until used.",
+        "May be defined at top level, within modules, submodules, or inside other definitions."
+      ],
+      "applies_to": [
+        "module",
+        "submodule",
+        "container",
+        "list",
+        "case",
+        "augment",
+        "rpc",
+        "notification"
+      ],
+      "examples": [
+        "grouping address { leaf street { type string; } leaf city { type string; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "uses",
+      "intent": "Instantiates the contents of a grouping at the place where 'uses' appears.",
+      "syntax": "uses <grouping-identifier> { ... }",
+      "substatements": [
+        {
+          "name": "when",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "refine",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "augment",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [
+        "Target grouping must be visible via imports/includes.",
+        "Refines can change certain properties of nodes within the grouping."
+      ],
+      "applies_to": [
+        "container",
+        "list",
+        "choice",
+        "case",
+        "grouping",
+        "rpc",
+        "notification",
+        "augment"
+      ],
+      "examples": [
+        "uses address; // includes street & city from grouping"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "refine",
+      "intent": "Modifies the properties of a node in a grouping when used.",
+      "syntax": "refine <descendant-schema-nodeid> { ... }",
+      "substatements": [
+        {
+          "name": "must",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "default",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "config",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "mandatory",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [
+        "Only certain properties may be refined; cannot change node kind or type.",
+        "Refine path must exist within the target grouping."
+      ],
+      "applies_to": [
+        "uses"
+      ],
+      "examples": [
+        "refine street { mandatory true; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "augment",
+      "intent": "Adds new schema nodes to an existing target node defined elsewhere.",
+      "syntax": "augment <target-node> { ... }",
+      "substatements": [
+        {
+          "name": "when",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "container|leaf|leaf-list|list|choice|anydata|anyxml",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "uses",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "action",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "notification",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [
+        "Target node must be visible to the augmenting module.",
+        "Augmentation must not violate cardinality or other constraints of the target."
+      ],
+      "applies_to": [
+        "module",
+        "submodule",
+        "uses"
+      ],
+      "examples": [
+        "augment \"/if:interfaces/if:interface\" { leaf mtu { type uint16; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "feature",
+      "intent": "Declares a named, optional capability that can be used in 'if-feature' expressions.",
+      "syntax": "feature <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [
+        "Features can depend on other features via 'if-feature'.",
+        "Server must advertise supported features in YANG library."
+      ],
+      "applies_to": [
+        "module",
+        "submodule"
+      ],
+      "examples": [
+        "feature jumbo { description \"Support jumbo frames\"; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "identity",
+      "intent": "Declares a globally unique, abstract identifier for use with 'identityref' type.",
+      "syntax": "identity <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "base",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [
+        "If 'base' is omitted, identity is a base identity itself.",
+        "Base identity must be visible to the defining module."
+      ],
+      "applies_to": [
+        "module",
+        "submodule"
+      ],
+      "examples": [
+        "identity address-family; identity ipv4 { base address-family; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "base",
+      "intent": "Indicates the base identity(ies) for an identity definition or for identityref type.",
+      "syntax": "base <identifier>",
+      "substatements": [],
+      "constraints": [
+        "For identity: base identity must be defined and visible.",
+        "For identityref type: base identity must be defined and visible."
+      ],
+      "applies_to": [
+        "identity",
+        "type(identityref)"
+      ],
+      "examples": [
+        "identity ipv4 { base address-family; }",
+        "leaf af { type identityref { base address-family; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "key",
+      "intent": "Specifies one or more leafs as keys for uniquely identifying list entries.",
+      "syntax": "key <leaf-name-list>",
+      "substatements": [],
+      "constraints": [
+        "All key leafs must exist in the list, be 'config true', and not have defaults.",
+        "Keys must be in schema order, separated by spaces."
+      ],
+      "applies_to": [
+        "list"
+      ],
+      "examples": [
+        "list interface { key \"name\"; leaf name { type string; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "unique",
+      "intent": "Enforces uniqueness constraints across combinations of leaf values in list entries.",
+      "syntax": "unique <descendant-schema-nodeid-list>",
+      "substatements": [],
+      "constraints": [
+        "Paths are evaluated relative to the list entry.",
+        "Tuple of values must be unique across all list entries."
+      ],
+      "applies_to": [
+        "list"
+      ],
+      "examples": [
+        "unique \"address port\""
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "ordered-by",
+      "intent": "Indicates whether entries in a list or leaf-list are user-ordered or system-ordered.",
+      "syntax": "ordered-by (system | user)",
+      "substatements": [],
+      "constraints": [
+        "Default is 'system'.",
+        "'user' means insertion order preserved."
+      ],
+      "applies_to": [
+        "list",
+        "leaf-list"
+      ],
+      "examples": [
+        "leaf-list servers { type string; ordered-by user; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "min-elements",
+      "intent": "Specifies the minimum number of elements in a list or leaf-list.",
+      "syntax": "min-elements <uint32>",
+      "substatements": [],
+      "constraints": [
+        "Must be less than or equal to max-elements if both present."
+      ],
+      "applies_to": [
+        "list",
+        "leaf-list"
+      ],
+      "examples": [
+        "min-elements 1"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "max-elements",
+      "intent": "Specifies the maximum number of elements in a list or leaf-list.",
+      "syntax": "max-elements <uint32>",
+      "substatements": [],
+      "constraints": [
+        "Must be greater than or equal to min-elements if both present."
+      ],
+      "applies_to": [
+        "list",
+        "leaf-list"
+      ],
+      "examples": [
+        "max-elements 10"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "config",
+      "intent": "Indicates whether a node represents configuration data or state data.",
+      "syntax": "config (true | false)",
+      "substatements": [],
+      "constraints": [
+        "Default is 'true' for configuration data nodes.",
+        "If 'false', the node is read-only state data."
+      ],
+      "applies_to": [
+        "container",
+        "leaf",
+        "leaf-list",
+        "list",
+        "anydata",
+        "anyxml"
+      ],
+      "examples": [
+        "leaf uptime { type uint32; config false; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "status",
+      "intent": "Indicates the lifecycle status of the definition.",
+      "syntax": "status (current | deprecated | obsolete)",
+      "substatements": [],
+      "constraints": [
+        "'current' means actively used.",
+        "'deprecated' means may be removed in the future.",
+        "'obsolete' means must not be implemented."
+      ],
+      "applies_to": [
+        "any definition statement"
+      ],
+      "examples": [
+        "status deprecated"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "mandatory",
+      "intent": "Specifies whether a leaf or choice must be present.",
+      "syntax": "mandatory (true | false)",
+      "substatements": [],
+      "constraints": [
+        "Default is false.",
+        "If 'true', the node must be present in valid configuration."
+      ],
+      "applies_to": [
+        "leaf",
+        "choice"
+      ],
+      "examples": [
+        "mandatory true"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "default",
+      "intent": "Specifies the default value for a leaf or leaf-list entry.",
+      "syntax": "default <value>",
+      "substatements": [],
+      "constraints": [
+        "Value must match the node's type.",
+        "Cannot be present if 'mandatory' is true."
+      ],
+      "applies_to": [
+        "leaf",
+        "leaf-list"
+      ],
+      "examples": [
+        "default 22"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "units",
+      "intent": "Provides the measurement units for the value of a leaf or leaf-list.",
+      "syntax": "units <string>",
+      "substatements": [],
+      "constraints": [],
+      "applies_to": [
+        "leaf",
+        "leaf-list"
+      ],
+      "examples": [
+        "units seconds"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "description",
+      "intent": "Provides human-readable explanation of the definition.",
+      "syntax": "description <text>",
+      "substatements": [],
+      "constraints": [],
+      "applies_to": [
+        "any definition statement"
+      ],
+      "examples": [
+        "description \"Configured maximum number of sessions.\""
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "reference",
+      "intent": "Provides a reference to an external document or standard.",
+      "syntax": "reference <text>",
+      "substatements": [],
+      "constraints": [],
+      "applies_to": [
+        "any definition statement"
+      ],
+      "examples": [
+        "reference \"RFC 7950, Section 7.19.4\""
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "rpc",
+      "intent": "Declares a remote procedure call that can be invoked via NETCONF/RESTCONF.",
+      "syntax": "rpc <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "input",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "output",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "module",
+        "submodule"
+      ],
+      "examples": [
+        "rpc reset { input { leaf id { type string; } } output { leaf result { type string; } } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "action",
+      "intent": "Declares an operation that applies to a particular data node instance.",
+      "syntax": "action <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "input",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "output",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [
+        "Can appear inside containers, lists, and choices."
+      ],
+      "applies_to": [
+        "container",
+        "list"
+      ],
+      "examples": [
+        "action restart { input { leaf delay { type uint32; } } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "input",
+      "intent": "Defines the input parameters for an RPC or action.",
+      "syntax": "input { ... }",
+      "substatements": [
+        {
+          "name": "must",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "typedef",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "grouping",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "container|leaf|leaf-list|list|choice|anydata|anyxml",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "uses",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "rpc",
+        "action"
+      ],
+      "examples": [
+        "input { leaf id { type string; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "output",
+      "intent": "Defines the output parameters for an RPC or action.",
+      "syntax": "output { ... }",
+      "substatements": [
+        {
+          "name": "must",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "typedef",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "grouping",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "container|leaf|leaf-list|list|choice|anydata|anyxml",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "uses",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "rpc",
+        "action"
+      ],
+      "examples": [
+        "output { leaf result { type string; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "notification",
+      "intent": "Declares an asynchronous event notification sent from the server.",
+      "syntax": "notification <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "if-feature",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "typedef",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "grouping",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "container|leaf|leaf-list|list|choice|anydata|anyxml",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "uses",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "must",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "module",
+        "submodule",
+        "container",
+        "list"
+      ],
+      "examples": [
+        "notification link-down { leaf if-name { type string; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "pattern",
+      "intent": "Specifies a regular expression constraint for a string type.",
+      "syntax": "pattern <regex> { ... }",
+      "substatements": [
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "error-message",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "error-app-tag",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [
+        "Regex syntax per XML Schema regex rules.",
+        "Multiple patterns are ANDed."
+      ],
+      "applies_to": [
+        "type(string)"
+      ],
+      "examples": [
+        "pattern '[0-9]{4}-[0-9]{2}-[0-9]{2}'"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "range",
+      "intent": "Specifies numeric range constraints for integer, decimal64, or unsigned types.",
+      "syntax": "range <range-spec> { ... }",
+      "substatements": [
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "error-message",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "error-app-tag",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [
+        "Range values must be within base type limits.",
+        "Multiple ranges are ORed."
+      ],
+      "applies_to": [
+        "type(int*)",
+        "type(uint*)",
+        "type(decimal64)"
+      ],
+      "examples": [
+        "range 1..100"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "length",
+      "intent": "Specifies length constraints for strings or binary types.",
+      "syntax": "length <length-spec> { ... }",
+      "substatements": [
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "error-message",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "error-app-tag",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [
+        "Length units are characters for strings, octets for binary.",
+        "Multiple lengths are ORed."
+      ],
+      "applies_to": [
+        "type(string)",
+        "type(binary)"
+      ],
+      "examples": [
+        "length 1..255"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "enum",
+      "intent": "Specifies one possible named value for an enumeration type.",
+      "syntax": "enum <string> { ... }",
+      "substatements": [
+        {
+          "name": "value",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "type(enumeration)"
+      ],
+      "examples": [
+        "enum up { value 1; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "value",
+      "intent": "Assigns a numeric value to an enum or bit position.",
+      "syntax": "value <integer>",
+      "substatements": [],
+      "constraints": [
+        "For enum: value must be unique in type.",
+        "For bit: position number assigned via value."
+      ],
+      "applies_to": [
+        "enum",
+        "bit"
+      ],
+      "examples": [
+        "value 10"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "bit",
+      "intent": "Specifies one named bit position in a bits type.",
+      "syntax": "bit <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "position",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "type(bits)"
+      ],
+      "examples": [
+        "bit enable; bit disable { position 1; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "position",
+      "intent": "Specifies the bit position for a bit in bits type.",
+      "syntax": "position <non-negative-integer>",
+      "substatements": [],
+      "constraints": [
+        "Positions must be unique within bits type."
+      ],
+      "applies_to": [
+        "bit"
+      ],
+      "examples": [
+        "position 5"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "fraction-digits",
+      "intent": "Specifies the number of fractional decimal digits for a decimal64 type.",
+      "syntax": "fraction-digits <1-18>",
+      "substatements": [],
+      "constraints": [],
+      "applies_to": [
+        "type(decimal64)"
+      ],
+      "examples": [
+        "fraction-digits 3"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "path",
+      "intent": "Specifies the schema node path for an instance-identifier or leafref type.",
+      "syntax": "path <xpath-expression>",
+      "substatements": [],
+      "constraints": [
+        "XPath is evaluated relative to the leafref/instance-identifier's context."
+      ],
+      "applies_to": [
+        "type(leafref)",
+        "type(instance-identifier)"
+      ],
+      "examples": [
+        "path \"/if:interfaces/if:interface/if:name\""
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "require-instance",
+      "intent": "Specifies whether the instance-identifier value must reference an existing node.",
+      "syntax": "require-instance (true | false)",
+      "substatements": [],
+      "constraints": [
+        "Default is 'true'."
+      ],
+      "applies_to": [
+        "type(instance-identifier)"
+      ],
+      "examples": [
+        "require-instance false"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "import",
+      "intent": "Makes definitions from another module available for use.",
+      "syntax": "import <module-name> { ... }",
+      "substatements": [
+        {
+          "name": "prefix",
+          "cardinality": "1"
+        },
+        {
+          "name": "revision-date",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "module",
+        "submodule"
+      ],
+      "examples": [
+        "import ietf-inet-types { prefix inet; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "include",
+      "intent": "Includes the contents of a submodule into the module or submodule.",
+      "syntax": "include <submodule-name> { ... }",
+      "substatements": [
+        {
+          "name": "revision-date",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "module",
+        "submodule"
+      ],
+      "examples": [
+        "include if-extensions;"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "belongs-to",
+      "intent": "Specifies the module to which the submodule belongs.",
+      "syntax": "belongs-to <module-name> { prefix <prefix-arg>; }",
+      "substatements": [
+        {
+          "name": "prefix",
+          "cardinality": "1"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "submodule"
+      ],
+      "examples": [
+        "belongs-to example-module { prefix ex; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "revision",
+      "intent": "Specifies the revision date of the module or submodule and optional description/reference.",
+      "syntax": "revision <date> { ... }",
+      "substatements": [
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "module",
+        "submodule"
+      ],
+      "examples": [
+        "revision 2020-10-10 { description \"Initial revision\"; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "revision-date",
+      "intent": "Specifies the revision date of an imported or included module/submodule.",
+      "syntax": "revision-date <date>",
+      "substatements": [],
+      "constraints": [],
+      "applies_to": [
+        "import",
+        "include"
+      ],
+      "examples": [
+        "revision-date 2013-07-15"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "extension",
+      "intent": "Defines a new statement keyword that can be used as an extension in YANG.",
+      "syntax": "extension <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "argument",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "status",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "module",
+        "submodule"
+      ],
+      "examples": [
+        "extension myext { argument arg; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "argument",
+      "intent": "Specifies the argument name for an extension and whether it is in YIN element form.",
+      "syntax": "argument <identifier> { ... }",
+      "substatements": [
+        {
+          "name": "yin-element",
+          "cardinality": "0..1"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "extension"
+      ],
+      "examples": [
+        "argument units { yin-element true; }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "yin-element",
+      "intent": "Indicates whether the argument of an extension is in YIN element form.",
+      "syntax": "yin-element (true | false)",
+      "substatements": [],
+      "constraints": [],
+      "applies_to": [
+        "argument"
+      ],
+      "examples": [
+        "yin-element true"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "deviation",
+      "intent": "Specifies deviations from the standard module definition for a particular implementation.",
+      "syntax": "deviation <target-node> { ... }",
+      "substatements": [
+        {
+          "name": "description",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "reference",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "deviate",
+          "cardinality": "1..n"
+        }
+      ],
+      "constraints": [
+        "Target node must be visible.",
+        "Each deviate statement modifies specific aspects."
+      ],
+      "applies_to": [
+        "module",
+        "submodule"
+      ],
+      "examples": [
+        "deviation /if:interfaces/if:interface/if:mtu { deviate replace { type uint32; } }"
+      ],
+      "yang_version": "1.1"
+    },
+    {
+      "name": "deviate",
+      "intent": "Specifies how a target node is being deviated.",
+      "syntax": "deviate (not-supported | add | replace | delete) { ... }",
+      "substatements": [
+        {
+          "name": "config",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "default",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "mandatory",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "max-elements",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "min-elements",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "must",
+          "cardinality": "0..n"
+        },
+        {
+          "name": "type",
+          "cardinality": "0..1"
+        },
+        {
+          "name": "unique",
+          "cardinality": "0..n"
+        }
+      ],
+      "constraints": [],
+      "applies_to": [
+        "deviation"
+      ],
+      "examples": [
+        "deviate not-supported"
+      ],
+      "yang_version": "1.1"
+    }
+  ],
+  "compliance_rules": [
+    {
+      "id": "RFC7952-ANN-DEF-CARDINALITY",
+      "source": "RFC7952 \u00a73 (Table 2) \ue200filecite\ue202turn1file15\ue201",
+      "level": "MUST",
+      "applies_to": "md:annotation",
+      "rule": "Each md:annotation definition MUST contain exactly one 'type' substatement; optional substatements are: description (0..1), if-feature (0..n), reference (0..1), status (0..1), units (0..1).",
+      "rationale": "Ensures annotation definitions are well formed and types are enforced.",
+      "autofix_hint": "If 'type' is missing, insert a suitable built-in or derived type consistent with the intended semantics; remove any disallowed substatements."
+    },
+    {
+      "id": "RFC7952-ANN-SCALAR-ONLY",
+      "source": "RFC7952 \u00a72 (end of p.4) \ue200filecite\ue202turn1file16\ue201",
+      "level": "MUST NOT",
+      "applies_to": "Annotation usage",
+      "rule": "Annotations MUST be scalar values and MUST NOT be attached to an entire list or leaf-list instance\u2014only to individual list or leaf-list entries.",
+      "rationale": "XML/JSON encoding compatibility constraints.",
+      "autofix_hint": "If an annotation targets a list/leaf-list as a whole, move it to each affected entry (or to an appropriate container node) with scalar values."
+    },
+    {
+      "id": "RFC7952-ANN-NO-SEMANTIC-CHANGE",
+      "source": "RFC7952 \u00a73 (after Table 2) \ue200filecite\ue202turn1file11\ue201",
+      "level": "MUST NOT",
+      "applies_to": "Annotation definitions",
+      "rule": "An annotation MUST NOT change YANG data tree semantics (e.g., cannot override uniqueness of leaf-list entries).",
+      "rationale": "Annotations add metadata and must not alter core semantics.",
+      "autofix_hint": "Remove or rework annotations that attempt to enforce semantics doable by core YANG statements (use 'must', 'unique', etc. instead)."
+    },
+    {
+      "id": "RFC7952-ANN-MODULE-PURITY",
+      "source": "RFC7952 \u00a73 (after Table 2) \ue200filecite\ue202turn1file11\ue201",
+      "level": "SHOULD NOT",
+      "applies_to": "Modules defining md:annotation",
+      "rule": "A module containing md:annotation statements SHOULD NOT also define data nodes or groupings; derived types, identities, and features SHOULD NOT be defined unless used by the annotations.",
+      "rationale": "Keep annotation modules focused and reusable.",
+      "autofix_hint": "Move regular data definitions to a separate module unless directly required by the annotations."
+    },
+    {
+      "id": "RFC7952-ANN-ADVERTISE-BEFORE-USE",
+      "source": "RFC7952 \u00a74 \ue200filecite\ue202turn1file11\ue201",
+      "level": "MUST NOT",
+      "applies_to": "Clients/instances",
+      "rule": "Clients MUST NOT add an annotation unless the server advertises support by exporting the module that defines it.",
+      "rationale": "Prevents interop failures from unrecognized annotations.",
+      "autofix_hint": "Before emitting annotations, ensure server capability discovery includes the annotation\u2019s module; otherwise omit."
+    },
+    {
+      "id": "RFC7952-JSON-ANN-NAMING",
+      "source": "RFC7952 \u00a75.2.1 \ue200filecite\ue202turn1file5\ue201",
+      "level": "MUST",
+      "applies_to": "JSON instance encoding",
+      "rule": "Each annotation member name MUST be 'module-name \":\" annotation-name' (explicit module name is always required for annotations).",
+      "rationale": "Disambiguates annotation namespaces in JSON.",
+      "autofix_hint": "Prefix bare annotation names with their defining module and a colon."
+    },
+    {
+      "id": "RFC7952-JSON-ANN-VALUE-ENCODING",
+      "source": "RFC7952 \u00a75.2.1 \ue200filecite\ue202turn1file5\ue201",
+      "level": "SHALL",
+      "applies_to": "JSON instance encoding",
+      "rule": "The value of each annotation SHALL be encoded exactly as a leaf with the same YANG type (per RFC7951).",
+      "rationale": "Ensures consistent scalar encoding across data and annotations.",
+      "autofix_hint": "Apply RFC7951 rules for the annotation\u2019s YANG type."
+    },
+    {
+      "id": "RFC7952-JSON-ANN-CONTAINER-LIST-ANYDATA",
+      "source": "RFC7952 \u00a75.2.2 \ue200filecite\ue202turn1file5\ue201",
+      "level": "MUST",
+      "applies_to": "JSON instance encoding",
+      "rule": "For container, list entry, or anydata, attach a metadata object as the '@' member within that object.",
+      "rationale": "Standard placement of annotation metadata object.",
+      "autofix_hint": "Insert an '@' object sibling to other members and place annotation pairs within it."
+    },
+    {
+      "id": "RFC7952-JSON-ANN-LEAF-ANYXML",
+      "source": "RFC7952 \u00a75.2.3 \ue200filecite\ue202turn1file17\ue201",
+      "level": "MUST",
+      "applies_to": "JSON instance encoding",
+      "rule": "For leaf or anyxml, add a sibling member named '@' + <member-name> containing the metadata object; include the module prefix in the '@' name iff present in the annotated member name.",
+      "rationale": "Correct sibling placement and naming for scalar/anyxml.",
+      "autofix_hint": "Create '@<name>' (or '@mod:<name>') member adjacent to the value with the metadata object."
+    },
+    {
+      "id": "RFC7952-JSON-ANN-LEAFLIST",
+      "source": "RFC7952 \u00a75.2.4 \ue200filecite\ue202turn1file18\ue201",
+      "level": "MUST",
+      "applies_to": "JSON instance encoding",
+      "rule": "For a leaf-list, add sibling '@<leaf-list-name>' whose value is an array mapping 1:1 by index to entries; each element is a metadata object or null; trailing nulls MAY be omitted.",
+      "rationale": "Preserves positional mapping of annotations to entries.",
+      "autofix_hint": "Construct an annotation array matching the leaf-list length; fill unused indices with null and drop trailing nulls."
+    },
+    {
+      "id": "RFC7952-ANN-SECURITY-PARITY",
+      "source": "RFC7952 \u00a79 \ue200filecite\ue202turn1file14\ue201",
+      "level": "SHOULD",
+      "applies_to": "Access control",
+      "rule": "Annotations SHOULD be protected with the same or stricter access control as their target data node.",
+      "rationale": "Annotations may reveal sensitive metadata.",
+      "autofix_hint": "Align NACM rules for annotation paths with target node ACLs or stronger."
+    },
+    {
+      "id": "RFC8407-PREFIX-USAGE-EXTERNAL",
+      "source": "RFC8407 \u00a74.2 (prefix rules) \ue200filecite\ue202turn1file2\ue201",
+      "level": "MUST",
+      "applies_to": "Module text",
+      "rule": "A prefix MUST be used for any external statement (defined via 'extension') and for all identifiers imported from other modules and included from submodules.",
+      "rationale": "Avoids ambiguity across module boundaries.",
+      "autofix_hint": "Qualify external/foreign identifiers with the correct module prefix."
+    },
+    {
+      "id": "RFC8407-PREFIX-USAGE-LOCAL",
+      "source": "RFC8407 \u00a74.2 \ue200filecite\ue202turn1file2\ue201",
+      "level": "MUST/SHOULD",
+      "applies_to": "Module text",
+      "rule": "The local module prefix MUST be used in all 'default' statements for identityref or instance-identifier; it SHOULD be used in all path expressions.",
+      "rationale": "Prevents ambiguity in defaults and improves clarity in paths.",
+      "autofix_hint": "Add local prefix to identityref/instance-identifier defaults; qualify unprefixed names in XPath-like expressions."
+    },
+    {
+      "id": "RFC8407-ID-LENGTH",
+      "source": "RFC8407 \u00a74.3 \ue200filecite\ue202turn1file3\ue201",
+      "level": "MUST",
+      "applies_to": "All identifiers",
+      "rule": "Identifiers in published modules MUST be 1..64 characters (per 'identifier-arg-str').",
+      "rationale": "Ensures interoperability with tooling and specs.",
+      "autofix_hint": "Shorten identifiers exceeding 64 chars; avoid empty names."
+    },
+    {
+      "id": "RFC8407-ID-NAMING-CONVENTIONS",
+      "source": "RFC8407 \u00a74.3.1 \ue200filecite\ue202turn1file3\ue201",
+      "level": "SHOULD",
+      "applies_to": "All identifiers",
+      "rule": "Prefer lowercase letters, digits, and dashes; avoid repeating parent identifiers; use full words/acronyms; avoid embedding modeling semantics in names.",
+      "rationale": "Improves readability and consistency.",
+      "autofix_hint": "Rename to kebab-case; remove redundant parent terms; avoid names like 'config' or 'state' for semantics."
+    },
+    {
+      "id": "RFC8407-DEFAULTS-OMIT-COMMON",
+      "source": "RFC8407 \u00a74.4 (Statement Defaults table) \ue200filecite\ue202turn1file3\ue201",
+      "level": "SHOULD NOT",
+      "applies_to": "Module style",
+      "rule": "Avoid specifying substatements when using their common default values: config=true, mandatory=false, max-elements=unbounded, min-elements=0, ordered-by=system, status=current, yin-element=false.",
+      "rationale": "Reduces noise; improves readability.",
+      "autofix_hint": "Remove redundant defaulted substatements unless doing so would reduce clarity."
+    },
+    {
+      "id": "RFC8407-FEATURE-DESIGN",
+      "source": "RFC8407 \u00a74.17 (features) \ue200filecite\ue202turn1file9\ue201",
+      "level": "MUST/SHOULD",
+      "applies_to": "feature / if-feature",
+      "rule": "Within each 'feature', the 'description' MUST specify interactions with other features; avoid overly fine-grained features; if one feature requires another, add 'if-feature' in the dependent feature.",
+      "rationale": "Promotes coherent, discoverable feature sets.",
+      "autofix_hint": "Consolidate leaf-level features; add explicit dependency via 'if-feature'."
+    },
+    {
+      "id": "RFC8407-WHEN-VS-MUST",
+      "source": "RFC8407 \u00a74.18.2 \ue200filecite\ue202turn1file9\ue201",
+      "level": "SHOULD",
+      "applies_to": "Constraint selection",
+      "rule": "Use 'when' with 'augment' or 'uses' for conditional composition based on static properties (e.g., keys); remember that when=false deletes nodes silently and is not an error.",
+      "rationale": "Correct application of cross-object constraints.",
+      "autofix_hint": "Where conditional presence is intended, prefer 'when' on the augmented node; reserve 'must' for validating present data."
+    },
+    {
+      "id": "RFC8407-SEC-CONSIDERATIONS-TEMPLATE",
+      "source": "RFC8407 \u00a73.7\u2013\u00a73.7.1 \ue200filecite\ue202turn1file10\ue202turn1file13\ue201",
+      "level": "MUST",
+      "applies_to": "Specifications publishing modules",
+      "rule": "A specification defining modules MUST include a Security Considerations section patterned after the current IETF YANG security template; explicitly list sensitive writable/readable nodes and potentially harmful RPCs by name.",
+      "rationale": "Mandatory IETF process guidance for modules in specs.",
+      "autofix_hint": "Generate security text from the model inventory of 'config true' nodes, sensitive read nodes, and RPCs; include NACM/TLS/SSH references per template."
+    }
+  ]
+}
