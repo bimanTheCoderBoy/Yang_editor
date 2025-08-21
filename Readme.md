@@ -138,7 +138,12 @@ This is the most complex and critical part of the pipeline. It iterates through 
 
 2)  Adjust LLM
 
-
 -------------------NOT NEEDED THAT MUCH FOR NOW---------------------------------------------------------------------
 3)  Positional discrepancy
 4)  POST proccessing RULE based function(need data and thousands of question)
+
+
+## Things We can do further
+1) Add a Yang syntex fixer agent
+2) Create and Delete Node
+3) If user want to perform operation not just on a specific arg but also on the specific path description
