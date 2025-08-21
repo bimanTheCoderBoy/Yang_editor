@@ -1,0 +1,977 @@
+module converted-module {
+  yang-version 1.1;
+  namespace "http://example.com/ns/yang/converted-module";
+  prefix cm;
+  description "Converted GSM/GPRS network configuration module with validation rules";
+  container cmconfigdatafile {
+    description "Configuration data file container";
+    
+    leaf fileheader { 
+      type string; 
+      description "File header information";
+    }
+    
+    container subsession {
+      description "Subsession container for network elements";
+      
+      container NE {
+        description "Network Element container";
+        
+        list module {
+          key "module-id";
+          description "List of network modules";
+          
+          leaf module-id { 
+            type string; 
+            description "Unique identifier for the module";
+          }
+          
+          list moi {
+            key "moi-id";
+            description "Managed Object Instance list";
+            
+            leaf moi-id { 
+              type string; 
+              description "Unique identifier for the MOI";
+            }
+            
+            container attributes {
+              description "MOI attributes container";
+              
+              leaf CELLID { 
+                type string; 
+                description "Cell identifier";
+              }
+              leaf GLDSSSW { 
+                type string; 
+                description "GLDS switch parameter";
+              }
+              leaf ZEROBUFZONESW { 
+                type string; 
+                description "Zero buffer zone switch";
+              }
+              
+              leaf DLQUALIMITAMRFR { 
+                type string; 
+                description "Downlink quality limit for AMR full rate";
+              }
+              leaf DLQUALIMITAMRHR { 
+                type string; 
+                description "Downlink quality limit for AMR half rate";
+              }
+              leaf RXLEVOFF { 
+                type string; 
+                description "RX level offset";
+              }
+              leaf RXQUAL1 { 
+                type string; 
+                description "RX quality parameter 1";
+              }
+              leaf RXQUAL10 { 
+                type string; 
+                description "RX quality parameter 10";
+              }
+              leaf RXQUAL11 { 
+                type string; 
+                description "RX quality parameter 11";
+              }
+              leaf RXQUAL12 { 
+                type string; 
+                description "RX quality parameter 12";
+              }
+              leaf RXQUAL2 { 
+                type string; 
+                description "RX quality parameter 2";
+              }
+              leaf RXQUAL3 { 
+                type string; 
+                description "RX quality parameter 3";
+              }
+              leaf RXQUAL4 { 
+                type string; 
+                description "RX quality parameter 4";
+              }
+              leaf RXQUAL5 { 
+                type string; 
+                description "RX quality parameter 5";
+              }
+              leaf RXQUAL6 { 
+                type string; 
+                description "RX quality parameter 6";
+              }
+              leaf RXQUAL7 { 
+                type string; 
+                description "RX quality parameter 7";
+              }
+              leaf RXQUAL8 { 
+                type string; 
+                description "RX quality parameter 8";
+              }
+              leaf RXQUAL9 { 
+                type string; 
+                description "RX quality parameter 9";
+              }
+              leaf ULQUALIMITAMRFR { 
+                type string; 
+                description "Uplink quality limit for AMR full rate";
+              }
+              leaf ULQUALIMITAMRHR { 
+                type string; 
+                description "Uplink quality limit for AMR half rate";
+              }
+              
+              leaf BTSADJUST { 
+                type string; 
+                description "BTS adjustment parameter";
+              }
+              leaf CALLRESTABDIS { 
+                type string; 
+                description "Call reestablishment disable";
+              }
+              leaf CELL8PSKPOWERLEVEL { 
+                type string; 
+                description "Cell 8PSK power level";
+              }
+              leaf CELLSCENARIO { 
+                type string; 
+                description "Cell scenario configuration";
+              }
+              leaf CMEPRIOR { 
+                type string; 
+                description "CME priority";
+              }
+              leaf COMPSWITCH { 
+                type string; 
+                description "Compression switch";
+              }
+              leaf DIRECTRYEN { 
+                type string; 
+                description "Direct retry enable";
+              }
+              leaf DIVERT16QAMDELAY { 
+                type string; 
+                description "16QAM divert delay";
+              }
+              leaf DIVERT32QAMDELAY { 
+                type string; 
+                description "32QAM divert delay";
+              }
+              leaf DIVERT8PSKDELAY { 
+                type string; 
+                description "8PSK divert delay";
+              }
+              leaf DLCOMBFILTERSW { 
+                type string; 
+                description "Downlink comb filter switch";
+              }
+              leaf DNPCEN { 
+                type string; 
+                description "DNPC enable";
+              }
+              leaf DYNOPENTRXPOWER { 
+                type string; 
+                description "Dynamic open TRX power";
+              }
+              leaf ENCRY { 
+                type string; 
+                description "Encryption enable";
+              }
+              leaf ENCRYPTIONALGORITHM1ST { 
+                type string; 
+                description "Primary encryption algorithm";
+              }
+              leaf ENCRYPTIONALGORITHM2ND { 
+                type string; 
+                description "Secondary encryption algorithm";
+              }
+              leaf ENCRYPTIONALGORITHM3RD { 
+                type string; 
+                description "Third encryption algorithm";
+              }
+              leaf ENCRYPTIONALGORITHM4TH { 
+                type string; 
+                description "Fourth encryption algorithm";
+              }
+              leaf ENCRYPTIONALGORITHM5TH { 
+                type string; 
+                description "Fifth encryption algorithm";
+              }
+              leaf ENCRYPTIONALGORITHM6TH { 
+                type string; 
+                description "Sixth encryption algorithm";
+              }
+              leaf ENCRYPTIONALGORITHM7TH { 
+                type string; 
+                description "Seventh encryption algorithm";
+              }
+              leaf FASTCALLTCHTHRESHOLD { 
+                type string; 
+                description "Fast call TCH threshold";
+              }
+              leaf FRDLDTX { 
+                type string; 
+                description "FR downlink DTX";
+              }
+              leaf FRULDTX { 
+                type string; 
+                description "FR uplink DTX";
+              }
+              leaf GMSKDELAYDYNADJSW { 
+                type string; 
+                description "GMSK delay dynamic adjustment switch";
+              }
+              leaf HIGHMODPWREN { 
+                type string; 
+                description "High modulation power enable";
+              }
+              leaf HOACCCMBDECODALLOW { 
+                type string; 
+                description "HO access combined decoding allow";
+              }
+              leaf HRDLDTX { 
+                type string; 
+                description "HR downlink DTX";
+              }
+              leaf HRULDTX { 
+                type string; 
+                description "HR uplink DTX";
+              }
+              leaf ICBALLOW { 
+                type string; 
+                description "ICB allow";
+              }
+              leaf IMMASSCBB { 
+                type string; 
+                description "Immediate assignment CBB";
+              }
+              leaf IMMASSEN { 
+                type string; 
+                description "Immediate assignment enable";
+              }
+              leaf IMMTCHLOADTHRES { 
+                type string; 
+                description "Immediate TCH load threshold";
+              }
+              leaf LAYER { 
+                type string; 
+                description "Layer configuration";
+              }
+              leaf LEVELRPT { 
+                type string; 
+                description "Level report";
+              }
+              leaf MAXTA { 
+                type string; 
+                description "Maximum timing advance";
+              }
+              leaf MICCSWITCH { 
+                type string; 
+                description "MICC switch";
+              }
+              leaf NBAMRTFOSWITCH { 
+                type string; 
+                description "Narrowband AMR TFO switch";
+              }
+              leaf PDCH2SDEN { 
+                type string; 
+                description "PDCH to SDCCH enable";
+              }
+              leaf POWERREDUCE16QAM { 
+                type string; 
+                description "Power reduction for 16QAM";
+              }
+              leaf POWERREDUCE32QAM { 
+                type string; 
+                description "Power reduction for 32QAM";
+              }
+              leaf RTPSWITCH { 
+                type string; 
+                description "RTP switch";
+              }
+              leaf RXMIN { 
+                type string; 
+                description "Minimum RX level";
+              }
+              leaf SDDYN { 
+                type string; 
+                description "SDCCH dynamic";
+              }
+              leaf SIGDECODEENSWITCH { 
+                type string; 
+                description "Signal decode enable switch";
+              }
+              leaf SVHOCNGSTTHR { 
+                type string; 
+                description "SVHO congestion threshold";
+              }
+              leaf SVHODTXDTCTIMER { 
+                type string; 
+                description "SVHO DTX detection timer";
+              }
+              leaf SVHOHODELAYTIMER { 
+                type string; 
+                description "SVHO HO delay timer";
+              }
+              leaf SVHOSWITCH { 
+                type string; 
+                description "SVHO switch";
+              }
+              leaf ULROTSW { 
+                type string; 
+                description "Uplink ROT switch";
+              }
+              leaf UMAISSWITCH { 
+                type string; 
+                description "UMAIS switch";
+              }
+              leaf UPPCEN { 
+                type string; 
+                description "UPPC enable";
+              }
+              
+              leaf BHPREPOLICY { 
+                type string; 
+                description "BH pre-policy";
+              }
+              leaf CELLTCHREQARRRTCTRLSW { 
+                type string; 
+                description "Cell TCH request arrival rate control switch";
+              }
+              leaf CHREQCSMSGMAXNUMINPERIOD { 
+                type string; 
+                description "Channel request CS message max number in period";
+              }
+              leaf CHREQPSMSGMAXNUMINPERIOD { 
+                type string; 
+                description "Channel request PS message max number in period";
+              }
+              leaf CSRACHMINACCLEVCTRLSW { 
+                type string; 
+                description "CS RACH minimum access level control switch";
+              }
+              leaf HOACCERRTHLDOPTSW { 
+                type string; 
+                description "HO access error threshold option switch";
+              }
+              leaf LOCUPDMSGMAXNUMINPERIOD { 
+                type string; 
+                description "Location update message max number in period";
+              }
+              leaf PSRACHACCLEV { 
+                type string; 
+                description "PS RACH access level";
+              }
+              leaf PWRDIV { 
+                type string; 
+                description "Power diversity";
+              }
+              leaf PWRDIVIND { 
+                type string; 
+                description "Power diversity indicator";
+              }
+              leaf RACHACCLEV { 
+                type string; 
+                description "RACH access level";
+              }
+              leaf RANERRTHRED { 
+                type string; 
+                description "RAN error threshold";
+              }
+              leaf TRXAIDSWITCH { 
+                type string; 
+                description "TRX aid switch";
+              }
+              leaf VOICEVER { 
+                type string; 
+                description "Voice version";
+              }
+              
+              leaf ASSQUELEN { 
+                type string; 
+                description "Assignment queue length";
+              }
+              leaf ASSRETRYMAX { 
+                type string; 
+                description "Assignment retry maximum";
+              }
+              leaf CELLSELECTAFTERCALLREL { 
+                type string; 
+                description "Cell select after call release";
+              }
+              leaf DNSENDSMDIS { 
+                type string; 
+                description "DN send SM disable";
+              }
+              leaf EMCALLDIRRETRYOPT { 
+                type string; 
+                description "Emergency call direct retry option";
+              }
+              leaf EMCPRILV { 
+                type string; 
+                description "Emergency call priority level";
+              }
+              leaf FSTRTNTDDWITHOUTMR { 
+                type string; 
+                description "First retransmission TDD without MR";
+              }
+              leaf MAXTADROPCALLFILTER { 
+                type string; 
+                description "Maximum TA drop call filter";
+              }
+              leaf MAXTADROPCALLOPTSW { 
+                type string; 
+                description "Maximum TA drop call option switch";
+              }
+              leaf MAXTADROPCALLSWITCH { 
+                type string; 
+                description "Maximum TA drop call switch";
+              }
+              leaf MAXTADROPCALLTHRESHOLD { 
+                type string; 
+                description "Maximum TA drop call threshold";
+              }
+              leaf POSSI13 { 
+                type string; 
+                description "Position SI13";
+              }
+              leaf PREEMPTIONPERMIT { 
+                type string; 
+                description "Preemption permit";
+              }
+              leaf REASSFREQBAND { 
+                type string; 
+                description "Reassignment frequency band";
+              }
+              leaf TAADJINTV { 
+                type string; 
+                description "TA adjustment interval";
+              }
+              leaf TAADJOPTSW { 
+                type string; 
+                description "TA adjustment option switch";
+              }
+              leaf UPSENDSMDIS { 
+                type string; 
+                description "UP send SM disable";
+              }
+              
+              leaf RSVDPARA1 { 
+                type string; 
+                description "Reserved parameter 1";
+              }
+              leaf RSVDPARA2 { 
+                type string; 
+                description "Reserved parameter 2";
+              }
+              leaf RSVDPARA3 { 
+                type string; 
+                description "Reserved parameter 3";
+              }
+              leaf RSVDPARA4 { 
+                type string; 
+                description "Reserved parameter 4";
+              }
+              leaf RSVDPARA5 { 
+                type string; 
+                description "Reserved parameter 5";
+              }
+              leaf RSVDPARA6 { 
+                type string; 
+                description "Reserved parameter 6";
+              }
+              leaf RSVDPARA7 { 
+                type string; 
+                description "Reserved parameter 7";
+              }
+              leaf RSVDPARA8 { 
+                type string; 
+                description "Reserved parameter 8";
+              }
+              leaf RSVDPARA9 { 
+                type string; 
+                description "Reserved parameter 9";
+              }
+              leaf RSVDPARA10 { 
+                type string; 
+                description "Reserved parameter 10";
+              }
+              leaf RSVDPARA11 { 
+                type string; 
+                description "Reserved parameter 11";
+              }
+              leaf RSVDPARA12 { 
+                type string; 
+                description "Reserved parameter 12";
+              }
+              leaf RSVDPARA13 { 
+                type string; 
+                description "Reserved parameter 13";
+              }
+              leaf RSVDPARA14 { 
+                type string; 
+                description "Reserved parameter 14";
+              }
+              leaf RSVDPARA15 { 
+                type string; 
+                description "Reserved parameter 15";
+              }
+              leaf RSVDPARA16 { 
+                type string; 
+                description "Reserved parameter 16";
+              }
+              leaf RSVDPARA17 { 
+                type string; 
+                description "Reserved parameter 17";
+              }
+              leaf RSVDPARA18 { 
+                type string; 
+                description "Reserved parameter 18";
+              }
+              leaf RSVDPARA19 { 
+                type string; 
+                description "Reserved parameter 19";
+              }
+              leaf RSVDPARA20 { 
+                type string; 
+                description "Reserved parameter 20";
+              }
+              leaf RSVDPARA21 { 
+                type string; 
+                description "Reserved parameter 21";
+              }
+              leaf RSVDPARA22 { 
+                type string; 
+                description "Reserved parameter 22";
+              }
+              leaf RSVDPARA23 { 
+                type string; 
+                description "Reserved parameter 23";
+              }
+              leaf RSVDPARA24 { 
+                type string; 
+                description "Reserved parameter 24";
+              }
+              leaf RSVDPARA25 { 
+                type string; 
+                description "Reserved parameter 25";
+              }
+              
+              leaf BTSID { 
+                type string; 
+                description "Base Transceiver Station identifier";
+              }
+            }
+            
+            list trx {
+              key "trx-id";
+              description "Transceiver configuration list";
+              
+              leaf trx-id { 
+                type string; 
+                description "Transceiver identifier";
+              }
+              
+              container attributes {
+                description "TRX attributes";
+                
+                leaf ACTSTATUS { 
+                  type string; 
+                  description "Activation status";
+                }
+                leaf ADMSTAT { 
+                  type string; 
+                  description "Administrative state";
+                }
+                leaf CELLID { 
+                  type string; 
+                  description "Cell identifier";
+                }
+                leaf FREQ { 
+                  type string; 
+                  description "Frequency";
+                }
+                leaf GTRXGROUPID { 
+                  type string; 
+                  description "GTRX group identifier";
+                }
+                leaf ISMAINBCCH { 
+                  type string; 
+                  description "Is main BCCH";
+                }
+                leaf ISTMPTRX { 
+                  type string; 
+                  description "Is temporary TRX";
+                }
+                leaf TRXID { 
+                  type string; 
+                  description "TRX identifier";
+                }
+                leaf TRXNAME { 
+                  type string; 
+                  description "TRX name";
+                }
+                leaf TRXNO { 
+                  type string; 
+                  description "TRX number";
+                }
+                
+                leaf CPS { 
+                  type string; 
+                  description "Cell power status";
+                }
+                leaf DLPRECISEPCPWRINCRLEVEL { 
+                  type string; 
+                  description "Downlink precise PC power increase level";
+                }
+                leaf DSSTRXOFFLINE { 
+                  type string; 
+                  description "DSS TRX offline";
+                }
+                leaf EGBTSPOWT { 
+                  type string; 
+                  description "EG BTS power";
+                }
+                leaf FREQREUSEMODE { 
+                  type string; 
+                  description "Frequency reuse mode";
+                }
+                leaf IBCATGTCIRMAIOFIXED { 
+                  type string; 
+                  description "IBCA target CIR MAIO fixed";
+                }
+                leaf INHOPWROVERLOADTHRESHOLD1 { 
+                  type string; 
+                  description "In-hop power overload threshold 1";
+                }
+                leaf OPTL { 
+                  type string; 
+                  description "Output power target level";
+                }
+                leaf OUTHOPWROVERLOADTHRESHOLD1 { 
+                  type string; 
+                  description "Out-hop power overload threshold 1";
+                }
+                leaf PAOPTILEVEL { 
+                  type string; 
+                  description "PA optimization level";
+                }
+                leaf PL16QAM { 
+                  type string; 
+                  description "Power level 16QAM";
+                }
+                leaf PL32QAM { 
+                  type string; 
+                  description "Power level 32QAM";
+                }
+                leaf PL8PSK { 
+                  type string; 
+                  description "Power level 8PSK";
+                }
+                leaf POWL { 
+                  type string; 
+                  description "Power level";
+                }
+                leaf POWTUNIT { 
+                  type string; 
+                  description "Power unit";
+                }
+                leaf PWRSPNR { 
+                  type string; 
+                  description "Power SPNR";
+                }
+                leaf SDFLAG { 
+                  type string; 
+                  description "SD flag";
+                }
+                leaf TCHAJFLAG { 
+                  type string; 
+                  description "TCH adjustment flag";
+                }
+                leaf TRXLOGICLOCKSW { 
+                  type string; 
+                  description "TRX logic lock switch";
+                }
+                leaf TSPWRRESERVE1 { 
+                  type string; 
+                  description "TS power reserve 1";
+                }
+                
+                leaf HOPTYPE { 
+                  type string; 
+                  description "Hopping type";
+                }
+                leaf IUO { 
+                  type string; 
+                  description "IUO parameter";
+                }
+                leaf WLNKALMFLAG { 
+                  type string; 
+                  description "Wireless link alarm flag";
+                }
+                leaf GTRXRSVPARA5 { 
+                  type string; 
+                  description "GTRX reserved parameter 5";
+                }
+                leaf GTRXRSVSW { 
+                  type string; 
+                  description "GTRX reserved switch";
+                }
+                
+                leaf MAXPDCHNUM { 
+                  type string; 
+                  description "Maximum PDCH number";
+                }
+                leaf MAXTSOCP { 
+                  type string; 
+                  description "Maximum TS OCP";
+                }
+                leaf CENDTHD { 
+                  type string; 
+                  description "C end threshold";
+                }
+                leaf CSTARTTHD { 
+                  type string; 
+                  description "C start threshold";
+                }
+                leaf FCETHD { 
+                  type string; 
+                  description "FCE threshold";
+                }
+                leaf FCSTHD { 
+                  type string; 
+                  description "FCS threshold";
+                }
+              }
+              
+              list channel {
+                key "ch-no";
+                description "Channel configuration list";
+                
+                leaf ch-no { 
+                  type string; 
+                  description "Channel number";
+                }
+                
+                container attributes {
+                  description "Channel attributes";
+                  
+                  leaf ADMSTAT { 
+                    type string; 
+                    description "Administrative state";
+                  }
+                  leaf CHANRSV { 
+                    type string; 
+                    description "Channel reserved";
+                  }
+                  leaf CHNO { 
+                    type string; 
+                    description "Channel number";
+                  }
+                  leaf CHTYPE { 
+                    type string; 
+                    description "Channel type";
+                  }
+                  leaf GPRSCHPRI { 
+                    type string; 
+                    description "GPRS channel priority";
+                  }
+                  leaf TRXID { 
+                    type string; 
+                    description "TRX identifier";
+                  }
+                  leaf TSPRIORITY { 
+                    type string; 
+                    description "TS priority";
+                  }
+                  
+                  leaf TRXDSSHOPINDEX { 
+                    type string; 
+                    description "TRX DSS hop index";
+                  }
+                  leaf TRXDSSMAIO { 
+                    type string; 
+                    description "TRX DSS MAIO";
+                  }
+                  leaf TRXHOPINDEX { 
+                    type string; 
+                    description "TRX hop index";
+                  }
+                  leaf TRXMAIO { 
+                    type string; 
+                    description "TRX MAIO";
+                  }
+                }
+              }
+            }
+            
+            container gprs-config {
+              description "GPRS configuration parameters";
+              
+              leaf BVCI { 
+                type string; 
+                description "BSSGP Virtual Connection Identifier";
+              }
+              leaf NSEI { 
+                type string; 
+                description "Network Service Entity Identifier";
+              }
+            }
+            
+            container cell-basic {
+              description "Basic cell configuration parameters";
+              
+              leaf ACTSTATUS { 
+                type string; 
+                description "Activation status";
+              }
+              leaf ADMSTAT { 
+                type string; 
+                description "Administrative state";
+              }
+              leaf BCC { 
+                type string; 
+                description "Base station Color Code";
+              }
+              leaf BSPAGBLKSRES { 
+                type string; 
+                description "BS paging blocks reserved";
+              }
+              leaf BSPBCCHBLKS { 
+                type string; 
+                description "BS PBCCH blocks";
+              }
+              leaf BSPRACHBLKS { 
+                type string; 
+                description "BS PRACH blocks";
+              }
+              leaf CELLNAME { 
+                type string; 
+                description "Cell name";
+              }
+              leaf CI { 
+                type string; 
+                description "Cell Identity";
+              }
+              leaf CSDSP { 
+                type string; 
+                description "CS DSP";
+              }
+              leaf CSVSP { 
+                type string; 
+                description "CS VSP";
+              }
+              leaf EXTTP { 
+                type string; 
+                description "External TTP";
+              }
+              leaf FLEXMAIO { 
+                type string; 
+                description "Flexible MAIO";
+              }
+              leaf GLOCELLID { 
+                type uint16 {
+                  range "1..1000";
+                }
+                description "Global cell identifier - must be between 1 and 1000";
+              }
+              leaf HYBHIFREQBANDSUPPORT { 
+                type string; 
+                description "Hybrid high frequency band support";
+              }
+              leaf IUOTP { 
+                type string; 
+                description "IUO TP";
+              }
+              leaf LAC { 
+                type string; 
+                description "Location Area Code";
+              }
+              leaf MOCNCMCELL { 
+                type string; 
+                description "MOC NCM cell";
+              }
+              leaf NCC { 
+                type string; 
+                description "Network Color Code";
+              }
+              leaf OPNAME { 
+                type string; 
+                description "Operator name";
+              }
+              leaf PSHPSP { 
+                type string; 
+                description "PS HP SP";
+              }
+              leaf PSLPSVP { 
+                type string; 
+                description "PS LP SVP";
+              }
+              leaf REMARK { 
+                type string; 
+                description "Remark";
+              }
+              leaf TYPE { 
+                type enumeration {
+                  enum "CELLPWRSAVINGPOLICY" {
+                    description "Cell power saving policy type";
+                  }
+                  enum "OTHER" {
+                    description "Other type";
+                  }
+                }
+                description "Cell type configuration";
+              }
+              leaf VIPCELL { 
+                type string; 
+                description "VIP cell";
+              }
+              
+              leaf FREQ1 { 
+                type string; 
+                description "Primary frequency";
+              }
+              leaf OPC { 
+                type string; 
+                description "OPC parameter";
+              }
+              leaf TEMPLATENAME { 
+                type string; 
+                description "Template name";
+              }
+            }
+            
+            container location-services {
+              description "Location services configuration";
+              
+              leaf GMDTASKMODE { 
+                type string; 
+                description "GMD task mode";
+              }
+              leaf GMDTASKSWITCH { 
+                type string; 
+                description "GMD task switch";
+              }
+              leaf PERIOD { 
+                type string; 
+                description "Period";
+              }
+              leaf PRECISIONMDT { 
+                type string; 
+                description "Precision MDT";
+              }
+              leaf SMLCID { 
+                type string; 
+                description "SMLC identifier";
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    leaf filefooter { 
+      type string; 
+      description "File footer information";
+    }
+  }
+}

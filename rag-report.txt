@@ -1,0 +1,82 @@
+----------------------------------RAG REPORT-------------------------------------------------
+SAMPLE INPUT-OUTPUT 01 :
+ Actions: [
+  	{
+   	 "action": "Validate that leaf GLDSSSW length does not exceed 50 characters",
+   	 "details": "Check the string length of the GLDSSSW leaf in each moi entry to ensure it is 50 characters or fewer."
+  	},
+	
+]
+
+Path: /converted-module/cmconfigdatafile/subsession/NE/module/moi/attributes/GLDSSSW
+Node: {'keyword': 'leaf', 'arg': 'GLDSSSW', 'metadata': [{'keyword': 'type', 'arg': 'string'}, {'keyword': 'description', 'arg': 'GLDS switch parameter'}]}
+
+Result: {'keyword': 'leaf', 'arg': 'GLDSSSW', 'metadata': [{'keyword': 'type', 'arg': 'string', 'substmts': [{'keyword': 'length', 'arg': '1..50', 'substmts': []}]}, {'keyword': 'description', 'arg': 'GLDS switch parameter', 'substmts': []}]}
+
+
+--------------------------------------------------------------------------------------------------------------
+SAMPLE INPUT-OUTPUT 02 :
+
+Actions: [
+  {
+    "action": "Ensure leaf ZEROBUFZONESW is mandatory",
+    "details": "Verify that the ZEROBUFZONESW leaf is present and not empty in each moi entry."
+  }
+ ]
+
+Path: /converted-module/cmconfigdatafile/subsession/NE/module/moi/attributes/ZEROBUFZONESW
+
+Node: {'keyword': 'leaf', 'arg': 'ZEROBUFZONESW', 'metadata': [{'keyword': 'type', 'arg': 'string', 'substmts': []}, {'keyword': 'description', 'arg': 'Zero buffer zone switch', 'substmts': []}]}
+
+
+Result: {'keyword': 'leaf', 'arg': 'ZEROBUFZONESW', 'metadata': [{'keyword': 'type', 'arg': 'string', 'substmts': []}, {'keyword': 'description', 'arg': 'Zero buffer zone switch', 'substmts': []}, {'keyword': 'mandatory', 'arg': 'true', 'substmts': []}]}
+
+
+
+------------------------------------------------------------------------------------------------RAG STRATIGY------------------------------------------------------------------------------
+Stage 0 — JSON exact/id filter (always run)
+
+Exact match on arg + keyword (e.g., GLDSSSW & leaf) → MUST be included (top candidates).
+
+Stage 1 — JSON BM25 + JSON vector (small substatement docs)
+
+Return top J1 BM25 + top J2 vector docs (chunked small).
+
+Stage 2 — TXT BM25 + TXT vector (RFC chunks)
+
+Return top T1 BM25 + top T2 vector snippets (chunk by section/paragraph).
+
+Stage 3 — Merge, dedupe, compute combined pre-rerank score
+
+Keep provenance tag (source: json/node, source: json/subst, source:rfc/txt) and normalized canonical text for each candidate.
+
+Stage 4 — Cross-encoder rerank (query + candidate pairs) → final order.
+
+Stage 5 — LLM prompt with provenance (pass top-K with source tags and a short “recommended action / confidence” hint).
+
+
+
+
+
+3D viewer --> 0
+RAG pipeline implementing-->0
+RAG Analyze-->0
+RAG integrating--->0
+LLM Selection--->3
+Change the validation strategy (if one action making issue then change the other the restart with new updated yang)
+refine AST Tree format so that LLM can detect the path-->1
+Path selection behavior & create and delete capability-->2
+
+	Action List :
+		[
+
+			{
+			Action:
+			Details:
+			Path:
+			Intent:
+			}
+		] 
+
+
+

@@ -134,7 +134,7 @@ This is the most complex and critical part of the pipeline. It iterates through 
     -Adjust Embedding model
     -Continous JSON RULE improvement
     -Right Retrieval Stretagy
-
+    -Adhust Reranking Model
 
 2)  Adjust LLM
 
