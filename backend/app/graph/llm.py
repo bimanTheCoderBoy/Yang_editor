@@ -1,7 +1,7 @@
 from langchain_openai import ChatOpenAI
 
 llm_actioner_splitter =ChatOpenAI(
-    api_key="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",
+    api_key="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",
     base_url="https://openrouter.ai/api/v1",
     model_name="openai/gpt-oss-20b:free",
     temperature=0.1,
@@ -34,7 +34,7 @@ from langchain_ollama.chat_models import ChatOllama
 # )
 
 llm_action_executer =ChatOpenAI(
-    api_key="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",
+    api_key="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",
     base_url="https://openrouter.ai/api/v1",
     model_name="openai/gpt-oss-20b:free",
     # model_name="mistralai/devstral-small-2505:free"
