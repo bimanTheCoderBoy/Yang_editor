@@ -4,7 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
-from app.rag.repo import load_database
+
 
     
 
@@ -32,8 +32,7 @@ async def startup():
     
     from app.api import chat
     app.include_router(chat.router, prefix="/api")
-    load_database()
-    print("Database loaded successfully")
+    # print("Database loaded successfully")
 
   
 

@@ -7,7 +7,7 @@ from app.utils.yang_tools import ( get_yang_ast,
                                   find_paths_by_identifiers,
                                   update_ast_with_llm_metadata,
                                   verify_ast,get_yang_text,
-                                  validate_yang_text)
+                                  validate_yang_text, )
 from pydantic import BaseModel, Field
 from typing import List
 from app.graph.llm import llm_actioner_splitter, llm_action_executer
@@ -15,7 +15,7 @@ from langchain.output_parsers import PydanticOutputParser
 from app.graph.state import ActionList,Action,ASTNode, ASTRoot,Target, TAction
 from app.graph.llm import llm_action_executer, llm_actioner_splitter
 from app.store.AST_store import (save_ast, get_ast)
-from app.rag.repo import get_json_rulebook_retriever, get_txt_rulebook_retriever
+from app.rag.repo import get_optimal_docs
 import json
 
 
@@ -59,6 +59,7 @@ def convert_to_ast(state:AgentState):
     
     ast_id=save_ast(ast, ttl_seconds=3600)  
     summary=generate_ast_summary(ast)
+    print(summary)
     print("YANG TO AST PARSING SUCCESSFULL")
     return Command(
         goto="ACTIONLIST_BUILDER",
@@ -75,12 +76,9 @@ def actionlist_builder(state:AgentState):
     print("Building action list from AST...")
     parser = PydanticOutputParser(pydantic_object=ActionList)
     prompt=f"""
-    You are a Yang Model Task devider. You have access to user_query and the Yang model summary. 
+    You are a Yang Model Task devider. You have access to user_query and the Yang model's tree summary. 
     Your task is to first reason with the user_query and Yang model summary and then divide
-    a the whole task in to smaller single unit actions and find out it's final yang identifier/identifiers that is/are directly involved for that action.
-    like : 
-       if  user query : Ensure that the localCellId is not empty. then target will be [localCellId]
-    return me the list of (one liner action , [list of yang identifiers involved in the action], action explained)
+    a the whole task in to smaller single unit actions and find out it's paths the action applies to, from the ast tree you are provided to you bellow.
     USER QUERY:
     {state.user_query}
     SUMMARY of YANG MODEL AST(abstruct syntax tree):
@@ -125,13 +123,13 @@ def action_executer(state:AgentState):
     target_list:List[Target]=[]
     target_set=set()
     for act in action_list:
-        for target in act.targets:
+        for target in act.paths:
             target_set.add(target)
             
 
     for target in target_set:
        
-        actions=[action for action in action_list if  target in action.targets]
+        actions=[action for action in action_list if  target in action.paths]
         for act in actions:
             target_list.append(
                 Target(
@@ -156,83 +154,36 @@ def action_executer(state:AgentState):
         actions=target.action_list
         
         target_value=target.target_value
-        paths=find_paths_by_identifiers(ast,target_value)
-        
-        for path in paths:
-            
-            
-            data=get_ast_node_by_path(ast,path)
-            
-            
+
+        data=get_ast_node_by_path(ast,target_value)
+
+
            
-            print("GOT the AST Node for this path and action")
-            print(f"Going to execute for :-> \n    Actions: {json.dumps([a.model_dump() for a in actions], indent=2)}\n ")
-            print(f"Path: {path}")
-            print(f"Node: {data}")
+        print("GOT the AST Node for this path and action")
+        print(f"Going to execute for :-> \n    Actions: {json.dumps([a.model_dump() for a in actions], indent=2)}\n ")
+        print(f"Path: {target_value}")
+        print(f"Node: {data}")
            
 
-            #---------------------------------Dynamic Data Retrieval Hybrid Search with reranking--------------------------------------
-            # preparing data for JSON RULE Book retrieval
-            def search_words(data):
-                words = data["keyword"] + " " 
-                
-                for child in data.get("metadata", []):
-                    words += search_words(child)
-                for child in data.get("substmts", []):
-                    words += search_words(child)
-                
-                return words
+        #---------------------------------Dynamic Data Retrieval Hybrid Search with reranking--------------------------------------
+        # preparing data for JSON RULE Book retrieval
+       
 
-            words=search_words(data)
-            words=words.lower()
-            
-            action_str=""
-            for at in actions:
-                action_str+=f"{at.action} {at.details}"
+        word=data["keyword"]
+        word=word.lower()
+
+        action_str=""
+        for at in actions:
+            action_str+=f"{at.action} {at.details}"
                 
             # final data
-            json_retrieval_data=f"{words} {action_str}"
-            
-            #-------------------------------------------json data retrieval-----------------------------------------
-            json_rulebook_retriver= get_json_rulebook_retriever()
-            if json_rulebook_retriver:
-                # print("Questions to JSON DB")
-                # print(json_retrieval_data)
-                docs=json_rulebook_retriver.invoke(json_retrieval_data)
-                # print("GET result from JSON DB...")
-                # print(docs)
-                docs=[doc.metadata.get("metadata",doc) for doc in docs ]
-                # with open("app/rag/rule-book.json", "r") as f:
-                #     json_data = json.load(f) 
-                # docs = [doc for doc in json_data if doc["name"] in set(json_retrieval_data.split(" "))]
-            
-                json_retrieval_results=docs
-                # print("debug---- json_retrieval_results ")
-                # print(json_retrieval_data.split(" "))
-                # print("\n\n")
-                # print(json_retrieval_results)
-                print("GOT the JSON RULE BOOK DATA for this PATH and ACTION")
-            else:
-                print("json_rulebook_retriver is not set")
-                return {
-                    "event_message":"RETRIEVER IS NOT SET"
-                }
-            # preparing data for TXT RULE Book retrieval
-            txt_retrival_data=""
-            for at in actions:
-                txt_retrival_data+= f"{at.action}\n{at.details}\n"
-            txt_retriever=get_txt_rulebook_retriever()
-            if txt_retriever:
-                # print("Questions to TXT DB")
-                # print(txt_retrival_data)
-                docs=txt_retriever.invoke(txt_retrival_data)
-                txt_retrival_results=[doc.page_content for doc in docs]
-                # print("GET result from TXT DB...")
-                # print(txt_retrival_results)
-                print("GOT the TXT RULE BOOK DATA for this PATH and ACTION")
+        retrieval_data=f"{word} {action_str}"
+        retrieval_results=get_optimal_docs(retrieval_data)
+
+        
                 
                 
-            system_prompt = """
+        system_prompt = """
               You are a YANG AST node editor (authoritative, deterministic). 
 
             You will receive:
@@ -320,27 +271,24 @@ def action_executer(state:AgentState):
 
                 """
 
-            system_prompt+=f"\n At runtime append the exact Pydantic format instructions:{parser.get_format_instructions()}"
+        system_prompt+=f"\n At runtime append the exact Pydantic format instructions:{parser.get_format_instructions()}"
 
 
             
-            isError=False
+        isError=False
             #get relement RAG rule
             
             
             # [json.dumps(json.loads(r),indent=2) for r in json_retrieval_results]
             
-            for i in range(0,2):
-                human_prompt=f"""
+        for i in range(0,2):
+            human_prompt=f"""
                 Below is the node and action list you must process, plus relevant YANG rule data retrieved from the official rule book.
                 
-                === BEGIN RELEVANT RULES ( JSON format)===
-                {json_retrieval_results}
+                === BEGIN RELEVANT RULES===
+                {retrieval_results}
                 === END RELEVANT RULES ===
-                
-                === BEGIN RELEVANT RULES ( TXT format)===
-                {txt_retrival_results}
-                === END RELEVANT RULES ===
+               
                 Input Node:
                 {json.dumps(data, indent=2)}
 
@@ -350,46 +298,46 @@ def action_executer(state:AgentState):
 
                 Apply each action in order, Obey all the above rules use these rules to answer. After applying all actions, return the entire modified node as JSON following the ASTRoot schema.
                     """
-                if state.errors:
-                    human_prompt+=f"\n You did following error in your previous responss.\n {state.errors}\n Ensure there is no such error in your output"
+            if state.errors:
+                human_prompt+=f"\n You did following error in your previous responss.\n {state.errors}\n Ensure there is no such error in your output"
 
 
                 # print(f"DEBUG  --- \n {human_prompt} \n\n {system_prompt}\n --- DEBUG")
                 # print("DEBUG---------------")
                 # print(human_prompt)
-                print("Calling the LLM for getting the AST Node with applied actions ...")
-                result:ASTRoot=llm_action_executer.with_structured_output(ASTRoot).invoke([SystemMessage(system_prompt),HumanMessage(human_prompt)])
+            print("Calling the LLM for getting the AST Node with applied actions ...")
+            result:ASTRoot=llm_action_executer.with_structured_output(ASTRoot).invoke([SystemMessage(system_prompt),HumanMessage(human_prompt)])
                 
                 
                 
-                print("GOT LLM RESULT... FOR this PATH and ACTION")
-                print(str(result.dict()))
-                print("Validating the RESULT...")
-                u_ast=update_ast_with_llm_metadata(ast, path,result.dict())
-                ast=u_ast
-                error_check , errors=verify_ast(u_ast)
-                if(error_check):
-                    isError=False
-                    print("Validation done Going to execute next ACTION ")
-                    break
-                else:
-                    isError=True
-                    print(f"GOT error RETRYING.... {i+1}")
-                    state.errors=errors
-            if isError:
-                print("RESTARTING The full EXECUTION....")
-                if state.retry_count < 2:
-                    state.retry_count+=1
-                    return Command(
+            print("GOT LLM RESULT... FOR this PATH and ACTION")
+            print(str(result.dict()))
+            print("Validating the RESULT...")
+            u_ast=update_ast_with_llm_metadata(ast,target_value,result.dict())
+            ast=u_ast
+            error_check , errors=verify_ast(u_ast)
+            if(error_check):
+                isError=False
+                print("Validation done Going to execute next ACTION ")
+                break
+            else:
+                isError=True
+                print(f"GOT error RETRYING.... {i+1}")
+                state.errors=errors
+        if isError:
+            print("RESTARTING The full EXECUTION....")
+            if state.retry_count < 2:
+                state.retry_count+=1
+                return Command(
                         goto="AST_CONVERTER",
                         update={
                             "isError": True,
                             "retry_count": state.retry_count
                         }
                     )
-                else:
-                    print("Error happening MULTIPLE times.. RETRY by  ADJUSTING your prompt")
-                    return {
+            else:
+                print("Error happening MULTIPLE times.. RETRY by  ADJUSTING your prompt")
+                return {
                         "event_message": "Action execution failed after multiple retries. Please adjust your prompt.",
                         
                     } 

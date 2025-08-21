@@ -6,25 +6,54 @@ def print_ast_dfs(node, indent=0):
             for child in getattr(node, 'i_children', []):
                 print_ast_dfs(child, indent + 2)
 
-def ast_to_summary(ast_node, depth=0):
+def ast_to_summary(ast_node, prefix="", is_last=True):
     """
     Recursively walk YANG AST and return an indented structure summary.
     """
     lines = []
-    indent = "  " * depth
 
-    node_type = ast_node.keyword  # e.g. 'container', 'leaf', 'list'
-    node_name = ast_node.arg      # e.g. 'deviceId', 'interface'
+    node_type = getattr(ast_node, "keyword", None)
+    node_name = getattr(ast_node, "arg", None)
 
+    # Gracefully handle nodes without `arg`
     if node_type and node_name:
-        lines.append(f"{indent}{node_type} {node_name}")
-    elif node_type:  # for top-level like 'module'
-        lines.append(f"{indent}{node_type}")
+        label = f"{node_type} {node_name}"
+    elif node_type:
+        label = f"{node_type}"
+    else:
+        label = "<unknown>"
 
-    for child in getattr(ast_node, 'i_children', []):
-        lines.extend(ast_to_summary(child, depth + 1))
+    # Connector (root has no prefix)
+    connector = "└── " if is_last else "├── "
+    lines.append(prefix + connector + label if prefix else label)
+
+    # Iterate children
+    children = getattr(ast_node, "i_children", [])
+    for i, child in enumerate(children):
+        new_prefix = prefix + ("    " if is_last else "│   ")
+        lines.extend(ast_to_summary(child, new_prefix, i == len(children) - 1))
 
     return lines
+
+
+def ast_to_summary_json(ast_node):
+    """
+    Recursively walk YANG AST and return a structured JSON-friendly dict.
+    Each node has: type, name, and children.
+    """
+    node_type = ast_node.keyword  
+    node_name = getattr(ast_node, "arg", None)
+
+    node_dict = {
+        "type": node_type,
+        "name": node_name,
+        "substatements": []
+    }
+
+    for child in getattr(ast_node, 'i_children', []):
+        node_dict["substatements"].append(ast_to_summary_json(child))
+
+    return node_dict
 
 
 

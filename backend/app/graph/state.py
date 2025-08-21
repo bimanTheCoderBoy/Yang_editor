@@ -5,7 +5,7 @@ from typing import List
 
 class Action(BaseModel):
     action:str=Field(description="the single action need to be perform on the yang model")
-    targets:List[str]=Field(description="List of yang identifier like container, leaf, etc names involved in the action")
+    paths:List[str]=Field(description="The list of paths in the yang model that this action applies to")
     details:str=Field(description="The detailed info about the action. kind of a context for the action")
 
 class ActionList(BaseModel):
